@@ -126,7 +126,7 @@
     .form-label { font-size: 11px; color: var(--text-sub); display: block; margin-bottom: 4px; }
     .form-input { width: 100%; background: #080d16; border: 1px solid var(--card-border); border-radius: 10px; padding: 12px; color: #fff; font-size: 13px; outline: none; }
 
-    /* ATF Miners Grid (Infinite Scroll 1 - 500) */
+    /* Miners Grid (Starting from Current Level) */
     .miners-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -143,13 +143,6 @@
     .btn-miner { width: 100%; padding: 8px; border-radius: 10px; border: none; font-size: 11px; font-weight: 800; text-transform: uppercase; cursor: pointer; background: #182234; color: var(--accent-gold); }
     .btn-miner.active { background: rgba(0, 230, 118, 0.2); color: var(--accent-green); cursor: default; }
 
-    /* Streak & Tasks */
-    .task-row { display: flex; justify-content: space-between; align-items: center; background: #080d16; border: 1px solid var(--card-border); border-radius: 12px; padding: 12px; margin-bottom: 8px; }
-    .streak-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; margin: 10px 0; }
-    .streak-day { background: #080d16; border: 1px solid var(--card-border); border-radius: 8px; padding: 6px 2px; text-align: center; font-size: 9px; }
-    .streak-day.claimed { border-color: var(--accent-green); color: var(--accent-green); }
-    .streak-day.today { border-color: var(--accent-gold); }
-
     /* Bottom Nav Bar */
     .tab-content { display: none; }
     .tab-content.active { display: block; }
@@ -157,6 +150,13 @@
     .nav-item { display: flex; flex-direction: column; align-items: center; gap: 4px; color: var(--text-sub); font-size: 11px; cursor: pointer; flex: 1; text-align: center; }
     .nav-item.active { color: var(--accent-gold); font-weight: 700; }
     .nav-icon { font-size: 18px; }
+
+    /* Streak & Tasks */
+    .task-row { display: flex; justify-content: space-between; align-items: center; background: #080d16; border: 1px solid var(--card-border); border-radius: 12px; padding: 12px; margin-bottom: 8px; }
+    .streak-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; margin: 10px 0; }
+    .streak-day { background: #080d16; border: 1px solid var(--card-border); border-radius: 8px; padding: 6px 2px; text-align: center; font-size: 9px; }
+    .streak-day.claimed { border-color: var(--accent-green); color: var(--accent-green); }
+    .streak-day.today { border-color: var(--accent-gold); }
   </style>
 </head>
 <body>
@@ -199,7 +199,7 @@
         <div class="circle-label">Cloud Mining</div>
         <div class="circle-amount" id="mined-balance">0.0000</div>
         <div class="circle-speed" id="live-speed-txt">8.50 NEX / hr</div>
-        <div style="font-size: 10px; color: var(--text-sub); margin-top: 4px;" id="hold-status-txt">Hold TON/GRAM to reach Lvl 500</div>
+        <div style="font-size: 10px; color: var(--text-sub); margin-top: 4px;" id="hold-status-txt">Hold NEX to boost up to Lvl 500</div>
       </div>
     </div>
 
@@ -215,7 +215,7 @@
         <span style="font-size: 11px; color: var(--accent-cyan); font-weight: 700;">Stage 1 Pre-Sale</span>
       </div>
       <p style="font-size: 12px; color: var(--text-sub); margin: 6px 0 10px;">
-        Exchange TON/GRAM to secure allocations before January 1, 2027 listing.
+        Exchange TON to secure allocations before January 1, 2027 listing.
       </p>
 
       <div class="preorder-grid">
@@ -252,17 +252,17 @@
     </div>
   </div>
 
-  <!-- TAB 2: MINERS (LEVEL 1 TO 500 FULL LIST) -->
+  <!-- TAB 2: MINERS (STARTS FROM CURRENT LEVEL TO 500) -->
   <div id="tab-miners" class="tab-content">
     <div style="display: flex; justify-content: space-between; align-items: baseline;">
       <div style="font-size: 15px; font-weight: 800;">Node Rigs & Levels</div>
-      <div style="font-size: 12px; color: var(--accent-gold); font-weight: 800;" id="user-holding-txt">Holding: 0 TON</div>
+      <div style="font-size: 12px; color: var(--accent-gold); font-weight: 800;" id="user-holding-txt">Holding: 0 NEX</div>
     </div>
     <div style="font-size: 12px; color: var(--text-sub); margin-bottom: 12px;">
-      Levels 1 to 500 scale automatically based on TON/GRAM held in your wallet.
+      Showing your active level and upcoming progression up to <b>Level 500</b>.
     </div>
 
-    <!-- Infinite Scroll List from Level 1 to 500 -->
+    <!-- Container showing from userLevel upwards -->
     <div class="miners-grid" id="miners-list-container"></div>
   </div>
 
@@ -296,13 +296,23 @@
     </div>
   </div>
 
-  <!-- TAB 4: FRIENDS -->
+  <!-- TAB 4: FRIENDS (ACTIVE REFERRAL SYSTEM) -->
   <div id="tab-friends" class="tab-content">
     <div class="card">
       <div style="font-size: 15px; font-weight: 800; margin-bottom: 6px;">Invite Friends</div>
-      <p style="font-size: 12px; color: var(--text-sub); margin-bottom: 12px;">Get 10% of their mining yields and +50 NEX instantly.</p>
+      <p style="font-size: 12px; color: var(--text-sub); margin-bottom: 12px;">Get 10% of their mining yields and +100 NEX instantly per friend.</p>
       <input type="text" id="ref-link-display" class="form-input" readonly value="Generating..." style="margin-bottom: 12px;">
       <button class="btn-claim-huge" onclick="shareRefTelegram()">🚀 Invite Frens</button>
+    </div>
+
+    <div class="card">
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <span style="font-weight: 800; font-size: 14px;">Your Invited Friends</span>
+        <span style="color: var(--accent-green); font-size: 12px; font-weight: 700;" id="ref-count-txt">0 Friends (+0 NEX)</span>
+      </div>
+      <div id="friends-list" style="margin-top: 10px; font-size: 12px; color: var(--text-sub); text-align: center;">
+        No friends joined yet. Share your link to start earning!
+      </div>
     </div>
   </div>
 
@@ -345,7 +355,18 @@
     document.getElementById('user-display-name').innerText = '@' + (tg.initDataUnsafe.user.username || tg.initDataUnsafe.user.first_name);
   }
 
-  // TON Standard Bounceable Address Converter
+  // Handle Incoming Referral via Telegram Start Param
+  if (tg.initDataUnsafe && tg.initDataUnsafe.start_param) {
+    const referrer = tg.initDataUnsafe.start_param.replace('ref_', '');
+    if (referrer && referrer !== telegramUserId && !localStorage.getItem('nex_referred_by')) {
+      localStorage.setItem('nex_referred_by', referrer);
+      let bal = parseFloat(localStorage.getItem('nex_bal')) || 0.0;
+      bal += 100; // Welcome referral bonus
+      localStorage.setItem('nex_bal', bal);
+    }
+  }
+
+  // TON Bounceable Address Converter
   function toBounceableAddress(addrStr) {
     try {
       let b64 = addrStr.replace(/-/g, '+').replace(/_/g, '/');
@@ -372,33 +393,46 @@
     }
   }
 
-  // Helper to build standard text memo payload for Tonkeeper
-  function buildTextCommentPayload(commentText) {
-    const bytes = new TextEncoder().encode(commentText);
-    const full = new Uint8Array(4 + bytes.length);
-    full.set(bytes, 4); // First 4 bytes are 0x00000000 for simple comment opcode
-    let binary = "";
-    for (let i = 0; i < full.length; i++) binary += String.fromCharCode(full[i]);
-    return btoa(binary);
+  // TON Valid Text Comment Cell BoC Builder (Fixes 'Invalid payload' error permanently)
+  function makeCommentPayload(text) {
+    const bytes = new TextEncoder().encode(text);
+    if (bytes.length > 120) return "";
+    const len = bytes.length;
+    const bodyLen = 4 + len;
+    const boc = new Uint8Array(22 + bodyLen);
+    boc.set([
+      0xb5, 0xee, 0x9c, 0x72, // BoC magic
+      0x01, 0x01, 0x01, 0x01, // flags
+      0x00, 0x01,             // 1 root cell
+      0x00, 0x00, 0x00, 0x00, 0x00, 0x00, // cell headers
+      0x00,                   // cell descriptor 1 (0 refs)
+      Math.ceil((bodyLen * 8) / 8), // data bytes
+      0x00, 0x00, 0x00, 0x00  // Opcode: 0x00000000 (text comment)
+    ]);
+    boc.set(bytes, 22);
+    let s = "";
+    for (let i = 0; i < boc.length; i++) s += String.fromCharCode(boc[i]);
+    return btoa(s);
   }
 
   const ADMIN_WALLET = toBounceableAddress("UQDUUWNDj91KKR4Ia0eyazhxSVsdREn4AExTiqx2ArFOAdg4");
+  const NEX_MASTER_ADDRESS = "EQAeLwGfxkF0FYmX1y6s6Iqw2bt2JR0OjeV4tlXeHw9-1khw";
   let isWalletVerified = localStorage.getItem('nex_wallet_verified') === 'true';
 
-  // 1. Level System (Level 1 to 500 Full List)
+  // 1. Level System (Based on NEX Holding, Starts from userLevel)
   let userLevel = 1;
-  let tonHoldAmount = 0.0;
+  let nexHoldAmount = 0.0;
   let miningSpeed = 8.50;
 
   function renderMinersTab() {
     const container = document.getElementById('miners-list-container');
     container.innerHTML = "";
 
-    // Generate cards from Level 1 to 500
-    for (let lvl = 1; lvl <= 500; lvl++) {
+    // Starts directly from userLevel to 500 (Hide previous lower levels)
+    for (let lvl = userLevel; lvl <= 500; lvl++) {
       const isCurrent = lvl === userLevel;
-      const speed = (8.50 + (lvl - 1) * 0.15).toFixed(2);
-      const requiredTon = ((lvl - 1) * 0.02).toFixed(2);
+      const speed = (8.50 + (lvl - 1) * 0.20).toFixed(2);
+      const requiredNex = ((lvl - 1) * 1000).toLocaleString(); // 1,000 NEX hold per level
 
       const card = document.createElement('div');
       card.className = `miner-card ${isCurrent ? 'active' : ''}`;
@@ -406,11 +440,11 @@
         <div style="font-size: 11px; color: ${isCurrent ? 'var(--accent-green)' : 'var(--text-sub)'}; font-weight: 800;">Lvl ${lvl}</div>
         <div style="font-size: 26px; margin: 4px 0;">${isCurrent ? '⚡' : (lvl % 50 === 0 ? '👑' : '📦')}</div>
         <div style="font-size: 15px; font-weight: 800; color: ${isCurrent ? 'var(--accent-green)' : 'var(--accent-gold)'};">
-          ${isCurrent ? 'ACTIVE' : `Hold ${requiredTon} TON`}
+          ${isCurrent ? 'ACTIVE' : `Hold ${requiredNex} NEX`}
         </div>
         <div style="font-size: 10px; color: var(--text-sub); margin: 3px 0 6px;">Speed ${speed} NEX/h</div>
         <button class="btn-miner ${isCurrent ? 'active' : ''}">
-          ${isCurrent ? 'MINING ACTIVE' : `🔒 NEED LVL ${lvl}`}
+          ${isCurrent ? 'ACTIVE' : `🔒 NEED LVL ${lvl}`}
         </button>
       `;
       container.appendChild(card);
@@ -419,24 +453,32 @@
 
   async function checkWalletHolding(rawAddress) {
     try {
-      const res = await fetch(`https://tonapi.io/v2/accounts/${rawAddress}`);
+      // Check Jetton ($NEX) Balance
+      const res = await fetch(`https://tonapi.io/v2/accounts/${rawAddress}/jettons`);
       if (res.ok) {
         const data = await res.json();
-        const nano = data.balance || 0;
-        tonHoldAmount = parseFloat((nano / 1000000000).toFixed(4));
+        const nexItem = (data.balances || []).find(b => b.jetton && b.jetton.address.toLowerCase() === NEX_MASTER_ADDRESS.toLowerCase());
+        
+        if (nexItem) {
+          const decimals = nexItem.jetton.decimals || 9;
+          nexHoldAmount = parseFloat(nexItem.balance) / Math.pow(10, decimals);
+        } else {
+          nexHoldAmount = 0.0;
+        }
 
-        // Every 0.02 TON held = +1 Level (Max 500)
-        userLevel = Math.min(500, Math.max(1, Math.floor(tonHoldAmount / 0.02) + 1));
-        miningSpeed = 8.50 + (userLevel - 1) * 0.15;
+        // Every 1,000 NEX held = +1 Level (Max 500)
+        userLevel = Math.min(500, Math.max(1, Math.floor(nexHoldAmount / 1000) + 1));
+        miningSpeed = 8.50 + (userLevel - 1) * 0.20;
 
-        document.getElementById('user-holding-txt').innerText = `Holding: ${tonHoldAmount} TON`;
+        document.getElementById('user-holding-txt').innerText = `Holding: ${nexHoldAmount.toLocaleString()} NEX`;
         document.getElementById('pnl-level-badge').innerText = `Level ${userLevel} • Active`;
         document.getElementById('live-speed-txt').innerText = `${miningSpeed.toFixed(2)} NEX / hr`;
-        document.getElementById('hold-status-txt').innerText = `Level ${userLevel}/500 (Holding ${tonHoldAmount} TON)`;
+        document.getElementById('hold-status-txt').innerText = `Level ${userLevel}/500 (Holding ${nexHoldAmount.toLocaleString()} NEX)`;
         renderMinersTab();
       }
     } catch (e) {
       console.log("Holding check fallback:", e);
+      renderMinersTab();
     }
   }
 
@@ -472,7 +514,7 @@
     updateWalletVerifyUI();
   });
 
-  // 2. Verify Wallet Function with MEMO
+  // 2. Verify Wallet Function with Valid BoC Comment
   async function triggerWalletVerification() {
     if (!tonConnectUI.connected) {
       alert("Please connect your wallet first!");
@@ -481,14 +523,14 @@
     }
     if (isWalletVerified) return;
 
-    const verifyMemo = `NEXORA_VERIFY:TG_${telegramUserId}`;
+    const verifyMemo = `VERIFY_TG_${telegramUserId}`;
     const transaction = {
       validUntil: Math.floor(Date.now() / 1000) + 300,
       messages: [
         {
           address: ADMIN_WALLET,
           amount: "50000000", // 0.05 TON
-          payload: buildTextCommentPayload(verifyMemo)
+          payload: makeCommentPayload(verifyMemo)
         }
       ]
     };
@@ -507,7 +549,7 @@
     }
   }
 
-  // 3. Preorder Logic with MEMO (Token & Amount Tagged)
+  // 3. Preorder Logic with Valid BoC Comment
   let selectedTon = 0.1;
   let selectedNex = 1000;
 
@@ -539,7 +581,7 @@
       return;
     }
 
-    const preorderMemo = `NEXORA_PREORDER:${selectedNex}_NEX:TG_${telegramUserId}`;
+    const preorderMemo = `BUY_${selectedNex}_NEX_TG_${telegramUserId}`;
     const nanoAmount = Math.floor(selectedTon * 1000000000).toString();
     const transaction = {
       validUntil: Math.floor(Date.now() / 1000) + 300,
@@ -547,7 +589,7 @@
         {
           address: ADMIN_WALLET,
           amount: nanoAmount,
-          payload: buildTextCommentPayload(preorderMemo)
+          payload: makeCommentPayload(preorderMemo)
         }
       ]
     };
@@ -666,10 +708,11 @@
     el.classList.add('active');
   }
 
-  const refLink = `https://t.me/NEXORA_Crypto_Mining_Bot?start=${telegramUserId}`;
+  // Active Referral Link Generation
+  const refLink = `https://t.me/NEXORA_Crypto_Mining_Bot?start=ref_${telegramUserId}`;
   document.getElementById('ref-link-display').value = refLink;
   function shareRefTelegram() {
-    window.open(`https://t.me/share/url?url=${encodeURIComponent(refLink)}&text=${encodeURIComponent("⚡ Claim NEXORA ($NEX) on TON:")}`);
+    window.open(`https://t.me/share/url?url=${encodeURIComponent(refLink)}&text=${encodeURIComponent("⚡ Claim NEXORA ($NEX) on TON! Launching Jan 1, 2027:")}`);
   }
 </script>
 </body>
