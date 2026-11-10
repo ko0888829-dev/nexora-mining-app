@@ -3,78 +3,123 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <title>NEXORA Network</title>
+  <title>NEXORA Airdrop & Mining</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg: #070d18;
-      --card-bg: #0e1726;
-      --card-border: #1a273f;
+      --bg: #090e17;
+      --card-bg: #111a29;
+      --card-border: #1d2d47;
       --accent-cyan: #00e5ff;
       --accent-gold: #f59e0b;
       --accent-green: #10b981;
       --text-main: #ffffff;
-      --text-sub: #7e8fa6;
+      --text-sub: #8ea1b8;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; -webkit-tap-highlight-color: transparent; }
-    body { background: var(--bg); color: var(--text-main); min-height: 100vh; padding-bottom: 95px; }
+    body { background: var(--bg); color: var(--text-main); min-height: 100vh; padding-bottom: 90px; }
     .container { max-width: 480px; margin: 0 auto; padding: 16px; }
 
     /* Header */
-    .header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
-    .user-info { display: flex; align-items: center; gap: 10px; }
-    .avatar { width: 42px; height: 42px; border-radius: 50%; border: 2px solid var(--accent-cyan); background: #132238; display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 800; color: var(--accent-cyan); }
+    .header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; }
+    .user-profile { display: flex; align-items: center; gap: 10px; }
+    .avatar { width: 44px; height: 44px; border-radius: 50%; border: 2px solid var(--accent-cyan); overflow: hidden; background: #132238; display: flex; align-items: center; justify-content: center; }
+    .avatar img { width: 100%; height: 100%; object-fit: cover; }
     .user-name { font-size: 15px; font-weight: 800; }
     .user-tag { font-size: 12px; color: var(--text-sub); }
 
-    /* Cards */
-    .card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 18px; padding: 18px; margin-bottom: 14px; position: relative; }
-    .card-title { font-size: 13px; color: var(--text-sub); display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-    .balance-val { font-size: 32px; font-weight: 800; }
-    .balance-val span { font-size: 18px; color: var(--accent-cyan); font-weight: 700; }
+    /* Hero Balance Card */
+    .hero-card {
+      background: linear-gradient(145deg, #101c30, #0a1322);
+      border: 1px solid var(--card-border);
+      border-radius: 20px;
+      padding: 22px 18px;
+      text-align: center;
+      margin-bottom: 16px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+    }
+    .token-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(0, 229, 255, 0.1);
+      border: 1px solid var(--accent-cyan);
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 11px;
+      color: var(--accent-cyan);
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+    .hero-balance { font-size: 36px; font-weight: 800; letter-spacing: -0.5px; }
+    .hero-balance span { font-size: 20px; color: var(--accent-cyan); }
+    .hero-sub { font-size: 12px; color: var(--text-sub); margin-top: 4px; }
 
-    /* Mining */
-    .mining-val { font-size: 26px; font-weight: 800; color: var(--accent-cyan); margin: 6px 0; }
-    .progress-bar-bg { width: 100%; height: 8px; background: #08111e; border-radius: 10px; overflow: hidden; margin: 10px 0; }
-    .progress-bar-fill { height: 100%; width: 0%; background: linear-gradient(90deg, #0098ea, var(--accent-cyan)); transition: width 0.3s; }
-    .stats-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin: 14px 0; text-align: center; }
-    .stat-box { background: #08111e; border: 1px solid var(--card-border); border-radius: 12px; padding: 10px 4px; }
-    .stat-label { font-size: 10px; color: var(--text-sub); text-transform: uppercase; }
-    .stat-val { font-size: 13px; font-weight: 700; margin-top: 2px; }
+    /* Stats Row */
+    .stats-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
+    .stat-pill { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 14px; padding: 12px; text-align: center; }
+    .stat-pill-label { font-size: 11px; color: var(--text-sub); }
+    .stat-pill-val { font-size: 15px; font-weight: 800; color: #fff; margin-top: 2px; }
+
+    /* Section Cards */
+    .card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 18px; padding: 18px; margin-bottom: 14px; }
+    .card-head { font-size: 14px; font-weight: 800; display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+
+    /* Tasks Section */
+    .task-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #0b121e;
+      border: 1px solid var(--card-border);
+      border-radius: 14px;
+      padding: 12px 14px;
+      margin-bottom: 10px;
+    }
+    .task-info { display: flex; align-items: center; gap: 10px; }
+    .task-icon { font-size: 20px; }
+    .task-name { font-size: 13px; font-weight: 700; }
+    .task-reward { font-size: 11px; color: var(--accent-cyan); font-weight: 700; }
+    .btn-task {
+      padding: 8px 16px;
+      background: #142844;
+      border: 1px solid var(--accent-cyan);
+      color: var(--accent-cyan);
+      border-radius: 10px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .btn-task.done {
+      background: #09261a;
+      border-color: var(--accent-green);
+      color: var(--accent-green);
+      cursor: default;
+    }
 
     /* Buttons */
-    .btn-main { width: 100%; padding: 14px; border-radius: 12px; border: none; font-size: 14px; font-weight: 800; cursor: pointer; transition: 0.2s; }
-    .btn-mining { background: #0f2238; color: var(--accent-cyan); }
-    .btn-claim { background: linear-gradient(90deg, #00c6ff, #0072ff); color: #fff; }
-    .btn-gold { background: linear-gradient(90deg, #f59e0b, #d97706); color: #000; }
-    .btn-locked { background: #1a273f; color: #7e8fa6; cursor: not-allowed; }
+    .btn-main { width: 100%; padding: 14px; border-radius: 14px; border: none; font-size: 14px; font-weight: 800; cursor: pointer; }
+    .btn-action { background: linear-gradient(90deg, #00c6ff, #0072ff); color: #fff; box-shadow: 0 4px 15px rgba(0, 198, 255, 0.3); }
+    .btn-gold { background: linear-gradient(90deg, #f59e0b, #d97706); color: #000; font-weight: 800; }
+    .btn-locked { background: #172439; color: var(--text-sub); cursor: not-allowed; }
 
-    /* Daily Streak Grid in Tasks */
-    .streak-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; margin: 12px 0; }
-    .streak-day { background: #08111e; border: 1px solid var(--card-border); border-radius: 10px; padding: 8px 2px; text-align: center; }
-    .streak-day.claimed { border-color: var(--accent-green); background: #072118; color: var(--accent-green); }
-    .streak-day.today { border-color: var(--accent-gold); background: #261907; }
-    .day-num { font-size: 10px; color: var(--text-sub); font-weight: 700; }
-    .day-reward { font-size: 10px; color: var(--accent-cyan); font-weight: 800; margin-top: 2px; }
-
-    /* Tasks List */
-    .task-card { display: flex; justify-content: space-between; align-items: center; background: #08111e; border: 1px solid var(--card-border); border-radius: 12px; padding: 12px; margin-bottom: 8px; }
-    .task-title { font-size: 13px; font-weight: 700; }
-    .task-reward { font-size: 12px; color: var(--accent-cyan); font-weight: 700; margin-top: 2px; }
-    .btn-task { padding: 8px 14px; font-size: 12px; border-radius: 8px; border: none; font-weight: 700; cursor: pointer; background: #132742; color: var(--accent-cyan); }
-    .btn-task.done { background: #062b1b; color: var(--accent-green); cursor: default; }
-
-    /* Form Inputs */
+    /* Form */
     .form-group { margin-bottom: 12px; }
-    .form-label { font-size: 12px; color: var(--text-sub); margin-bottom: 6px; display: block; }
-    .form-input { width: 100%; background: #08111e; border: 1px solid var(--card-border); border-radius: 10px; padding: 12px; color: #fff; font-size: 14px; outline: none; }
+    .form-label { font-size: 11px; color: var(--text-sub); display: block; margin-bottom: 6px; }
+    .form-input { width: 100%; background: #0b121e; border: 1px solid var(--card-border); border-radius: 12px; padding: 12px; color: #fff; font-size: 13px; outline: none; }
 
-    /* Navigation */
+    /* Daily Streak in Tasks */
+    .streak-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; margin: 12px 0; }
+    .streak-day { background: #0b121e; border: 1px solid var(--card-border); border-radius: 10px; padding: 8px 2px; text-align: center; font-size: 10px; }
+    .streak-day.claimed { border-color: var(--accent-green); color: var(--accent-green); }
+    .streak-day.today { border-color: var(--accent-gold); background: #261907; }
+
+    /* Tabs & Nav */
     .tab-content { display: none; }
     .tab-content.active { display: block; }
-    .nav-bar { position: fixed; bottom: 0; left: 0; width: 100%; background: #080f1a; border-top: 1px solid var(--card-border); display: flex; justify-content: space-around; padding: 10px 0; z-index: 100; }
+    .nav-bar { position: fixed; bottom: 0; left: 0; width: 100%; background: #090e17; border-top: 1px solid var(--card-border); display: flex; justify-content: space-around; padding: 10px 0; z-index: 100; }
     .nav-item { display: flex; flex-direction: column; align-items: center; gap: 4px; color: var(--text-sub); font-size: 11px; cursor: pointer; flex: 1; text-align: center; }
     .nav-item.active { color: var(--accent-cyan); font-weight: 700; }
     .nav-icon { font-size: 18px; }
@@ -83,166 +128,169 @@
 <body>
 
 <div class="container">
-  <!-- Header with TON Connect -->
+  <!-- Header -->
   <div class="header">
-    <div class="user-info">
-      <div class="avatar">N</div>
+    <div class="user-profile">
+      <div class="avatar">
+        <img src="https://raw.githubusercontent.com/ko0888829-dev/nexora-mining-app/main/b8eaef4d5b36c1462442ea0e5ca4c496699eb547deae334aafde512cd8e1266e.png" alt="NEX">
+      </div>
       <div>
-        <div class="user-name">NEXORA</div>
+        <div class="user-name">NEXORA NETWORK</div>
         <div class="user-tag" id="user-display-name">@User</div>
       </div>
     </div>
     <div id="ton-connect-btn"></div>
   </div>
 
-  <!-- TAB 1: MINING -->
-  <div id="tab-mining" class="tab-content active">
-    <div class="card">
-      <div class="card-title">
-        <span>💼 Total NEX Balance</span>
-        <span style="color: var(--accent-green);" id="node-status-txt">● Node Inactive</span>
+  <!-- Hero Total Balance Display -->
+  <div class="hero-card">
+    <div class="token-badge">⚡ AIRDROP ALLOCATION</div>
+    <div class="hero-balance"><span id="total-balance">0.0000</span> <span>$NEX</span></div>
+    <div class="hero-sub">Estimated Listing Value: ~$0.05 / NEX</div>
+  </div>
+
+  <!-- TAB 1: AIRDROP & MINING HOME -->
+  <div id="tab-home" class="tab-content active">
+    <div class="stats-row">
+      <div class="stat-pill">
+        <div class="stat-pill-label">Node Status</div>
+        <div class="stat-pill-val" style="color: var(--accent-green);" id="node-status-txt">Inactive</div>
       </div>
-      <div class="balance-val"><span id="total-balance">0.0000</span> <span>$NEX</span></div>
+      <div class="stat-pill">
+        <div class="stat-pill-label">Mining Rate</div>
+        <div class="stat-pill-val">8.50 NEX / hr</div>
+      </div>
     </div>
 
     <div class="card">
-      <div class="card-title">
-        <span style="color: var(--accent-cyan);">⚡ Cloud Node Mining</span>
-        <span>Cycle: 4 Hours</span>
+      <div class="card-head">
+        <span>⚡ Cloud Node Allocator</span>
+        <span style="font-size: 11px; color: var(--accent-cyan);" id="mining-timer">04:00:00</span>
       </div>
-      <div class="mining-val">+<span id="mined-balance">0.0000</span> <span style="font-size: 16px; color: #fff;">NEX</span></div>
-
-      <div style="display: flex; justify-content: space-between; font-size: 11px; color: var(--text-sub);">
-        <span>Capacity Fill</span>
-        <span id="mining-timer">04:00:00</span>
-      </div>
-      <div class="progress-bar-bg">
-        <div class="progress-bar-fill" id="progress-fill"></div>
-      </div>
-
-      <div class="stats-grid">
-        <div class="stat-box">
-          <div class="stat-label">Rate / Hour</div>
-          <div class="stat-val">8.50 NEX</div>
-        </div>
-        <div class="stat-box">
-          <div class="stat-label">Daily Yield</div>
-          <div class="stat-val">~204 NEX</div>
-        </div>
-        <div class="stat-box">
-          <div class="stat-label">Booster</div>
-          <div class="stat-val" style="color: var(--accent-cyan);">x1.00</div>
-        </div>
+      <div style="font-size: 24px; font-weight: 800; color: var(--accent-cyan); margin-bottom: 12px;">
+        +<span id="mined-balance">0.0000</span> <span style="font-size: 14px; color: #fff;">NEX</span>
       </div>
 
       <button id="mining-btn" class="btn-main btn-gold" onclick="handleMiningAction()">
         ⚡ Activate Node (0.05 TON)
       </button>
     </div>
-
-    <div class="card" style="border-color: #1a273f; background: #09121f;">
-      <div style="font-size: 12px; color: var(--text-sub); line-height: 1.6;">
-        ℹ️ <b>Node Deployment:</b> A one-time verification fee of <b>0.05 TON</b> is required to allocate server resources and start mining.
-      </div>
-    </div>
   </div>
 
-  <!-- TAB 2: TASKS (DAILY CHECK-IN + MISSIONS) -->
+  <!-- TAB 2: TASKS & DAILY STREAK -->
   <div id="tab-tasks" class="tab-content">
-    <div class="card" style="border-color: var(--accent-gold);">
-      <div class="card-title">
-        <span style="font-weight: 700; color: #fff;">🎁 Daily Check-in Streak</span>
-        <span style="color: var(--accent-gold); font-weight: 700;" id="streak-count-txt">Day 1/7</span>
+    <div class="card">
+      <div class="card-head">
+        <span>🎁 Daily Check-in Streak</span>
+        <span style="color: var(--accent-gold); font-size: 12px;" id="streak-count-txt">Day 1/7</span>
       </div>
       <div class="streak-grid" id="streak-days"></div>
-      <button id="daily-claim-btn" class="btn-main btn-gold" style="padding: 10px;" onclick="claimDailyReward()">Claim Daily Check-in</button>
+      <button id="daily-claim-btn" class="btn-main btn-gold" style="padding: 10px;" onclick="claimDailyReward()">Claim Daily Airdrop</button>
     </div>
 
     <div class="card">
-      <div class="card-title">
-        <span style="font-weight: 800; color: #fff; font-size: 14px;">🎯 Ecosystem Missions</span>
-        <span style="color: var(--accent-cyan); font-size: 11px;">Instant NEX</span>
+      <div class="card-head">
+        <span>🎯 Mandatory Airdrop Tasks</span>
+        <span style="font-size: 11px; color: var(--accent-cyan);">Instant Bonus</span>
       </div>
 
-      <div class="task-card">
-        <div>
-          <div class="task-title">📢 Join Official Channel</div>
-          <div class="task-reward">+150 NEX</div>
+      <div class="task-item">
+        <div class="task-info">
+          <div class="task-icon">📢</div>
+          <div>
+            <div class="task-name">Join Telegram Channel</div>
+            <div class="task-reward">+150 $NEX</div>
+          </div>
         </div>
-        <button id="task-btn-1" class="btn-task" onclick="handleTask('task1', 150, 'https://t.me/A_TOOLSx2', this)">Start</button>
+        <button class="btn-task" onclick="handleTask('task1', 150, 'https://t.me/A_TOOLSx2', this)">Join</button>
       </div>
 
-      <div class="task-card">
-        <div>
-          <div class="task-title">💬 Join Community Group</div>
-          <div class="task-reward">+100 NEX</div>
+      <div class="task-item">
+        <div class="task-info">
+          <div class="task-icon">💬</div>
+          <div>
+            <div class="task-name">Join Telegram Group</div>
+            <div class="task-reward">+100 $NEX</div>
+          </div>
         </div>
-        <button id="task-btn-2" class="btn-task" onclick="handleTask('task2', 100, 'https://t.me/A_TOOLSx2', this)">Start</button>
+        <button class="btn-task" onclick="handleTask('task2', 100, 'https://t.me/A_TOOLSx2', this)">Join</button>
+      </div>
+
+      <div class="task-item">
+        <div class="task-info">
+          <div class="task-icon">💼</div>
+          <div>
+            <div class="task-name">Connect TON Wallet</div>
+            <div class="task-reward">+200 $NEX</div>
+          </div>
+        </div>
+        <button class="btn-task" id="btn-wallet-task" onclick="handleWalletTask(this)">Verify</button>
       </div>
     </div>
   </div>
 
-  <!-- TAB 3: FRIENDS -->
+  <!-- TAB 3: REFERRALS (ATF STYLE) -->
   <div id="tab-friends" class="tab-content">
     <div class="card">
-      <h3 style="margin-bottom: 6px;">Invite Partners</h3>
-      <p style="font-size: 13px; color: var(--text-sub); margin-bottom: 14px;">
-        Receive <b>10%</b> of all NEX mined by your friends!
-      </p>
-
-      <div style="background: #08111e; border: 1px solid var(--card-border); border-radius: 12px; padding: 12px; margin-bottom: 12px;">
-        <div style="font-size: 11px; color: var(--text-sub); margin-bottom: 4px;">Your Invite Link</div>
-        <div id="ref-link-display" style="font-size: 12px; color: var(--accent-cyan); word-break: break-all;">Generating...</div>
-      </div>
-
-      <button class="btn-main btn-claim" onclick="shareRefTelegram()">🚀 Invite Friends</button>
-    </div>
-  </div>
-
-  <!-- TAB 4: WITHDRAW -->
-  <div id="tab-wallet" class="tab-content">
-    <div class="card">
-      <div class="card-title">
-        <span style="font-weight: 800; color: #fff; font-size: 15px;">Withdraw $NEX</span>
-        <span style="color: var(--accent-cyan); font-size: 11px;">TON Network</span>
+      <div class="card-head">👥 Invite Friends to Earn</div>
+      <div style="font-size: 13px; color: var(--text-sub); margin-bottom: 14px;">
+        Earn <b>50 $NEX</b> for every verified friend who joins, plus <b>10%</b> of their ongoing mining yields.
       </div>
 
       <div class="form-group">
-        <label class="form-label">Recipient TON Wallet Address</label>
+        <label class="form-label">Your Unique Referral Link</label>
+        <input type="text" id="ref-link-display" class="form-input" readonly value="Generating...">
+      </div>
+
+      <button class="btn-main btn-action" onclick="shareRefTelegram()">🚀 Share Invite Link</button>
+    </div>
+  </div>
+
+  <!-- TAB 4: WITHDRAWAL FORM -->
+  <div id="tab-wallet" class="tab-content">
+    <div class="card">
+      <div class="card-head">
+        <span>💼 Request Airdrop Payout</span>
+        <span style="color: var(--accent-cyan); font-size: 11px;">TON Chain</span>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Recipient TON Wallet (Connected)</label>
         <input type="text" id="withdraw-addr" class="form-input" placeholder="UQ... or EQ...">
       </div>
 
       <div class="form-group">
-        <label class="form-label">Amount ($NEX)</label>
-        <input type="number" id="withdraw-amount" class="form-input" placeholder="Min. 500 NEX" value="500">
+        <label class="form-label">Withdrawal Amount ($NEX)</label>
+        <input type="number" id="withdraw-amount" class="form-input" value="500">
       </div>
 
-      <div style="background: #08111e; border-radius: 10px; padding: 12px; margin-bottom: 14px; font-size: 12px;">
+      <div style="background: #0b121e; border-radius: 12px; padding: 12px; margin-bottom: 14px; font-size: 12px;">
         <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
-          <span style="color: var(--text-sub);">Network Gas Fee:</span>
-          <span style="color: var(--accent-green);">0 TON (Covered)</span>
+          <span style="color: var(--text-sub);">Gas Fee:</span>
+          <span style="color: var(--accent-green);">0 TON (Subsidized)</span>
         </div>
         <div style="display: flex; justify-content: space-between;">
-          <span style="color: var(--text-sub);">Protocol Fee (5%):</span>
-          <span style="color: var(--text-sub);">25 NEX</span>
+          <span style="color: var(--text-sub);">Protocol Fee:</span>
+          <span style="color: var(--text-sub);">5%</span>
         </div>
       </div>
 
-      <button class="btn-main btn-locked" onclick="alert('Withdrawals and DEX claim portal will be activated on January 1, 2027!')">
+      <button class="btn-main btn-locked" onclick="alert('Airdrop withdrawals open on January 1, 2027!')">
         🔒 Available on January 1, 2027
       </button>
+
       <div style="text-align: center; font-size: 11px; color: var(--accent-gold); margin-top: 10px;">
-        🗓️ Official listing and payout release date: <b>January 1, 2027 (00:00 UTC)</b>
+        🗓️ Official TGE & Distribution date: <b>January 1, 2027 (00:00 UTC)</b>
       </div>
     </div>
   </div>
 </div>
 
-<!-- Nav Bar -->
+<!-- Bottom Navigation Bar -->
 <div class="nav-bar">
-  <div class="nav-item active" onclick="switchTab('tab-mining', this)"><div class="nav-icon">⚡</div><div>Mining</div></div>
+  <div class="nav-item active" onclick="switchTab('tab-home', this)"><div class="nav-icon">🏠</div><div>Home</div></div>
   <div class="nav-item" onclick="switchTab('tab-tasks', this)"><div class="nav-icon">🎯</div><div>Tasks</div></div>
-  <div class="nav-item" onclick="switchTab('tab-friends', this)"><div class="nav-icon">👥</div><div>Friends</div></div>
+  <div class="nav-item" onclick="switchTab('tab-friends', this)"><div class="nav-icon">👥</div><div>Frens</div></div>
   <div class="nav-item" onclick="switchTab('tab-wallet', this)"><div class="nav-icon">💼</div><div>Withdraw</div></div>
 </div>
 
@@ -257,10 +305,9 @@
     document.getElementById('user-display-name').innerText = '@' + (tg.initDataUnsafe.user.username || tg.initDataUnsafe.user.first_name);
   }
 
-  // TON Connect (လက်ရှိ host domain ဆီမှ manifest ကို ဆွဲယူမည်)
-  const manifestUrl = window.location.origin + '/tonconnect-manifest.json';
+  // TON Connect
   const tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
-    manifestUrl: manifestUrl,
+    manifestUrl: window.location.origin + '/tonconnect-manifest.json',
     buttonRootId: 'ton-connect-btn'
   });
 
@@ -270,9 +317,10 @@
     }
   });
 
+  // 0.05 TON Activation & Mining
   const MINING_SPEED = 8.50;
   const CYCLE_SECONDS = 4 * 3600;
-  const ADMIN_WALLET = "UQCtK8T282nvdQvXQ9yHffu4O9T9E-4qYqB8N_9_U6yUuES8";
+  const ADMIN_WALLET = "EQCtK8T282nvdQvXQ9yHffu4O9T9E-4qYqB8N_9_U6yUuWk2";
 
   let isNodeActive = localStorage.getItem('nex_node_active') === 'true';
   let totalBalance = parseFloat(localStorage.getItem('nex_bal')) || 0.0;
@@ -280,11 +328,10 @@
 
   function updateMiningUI() {
     if (!isNodeActive) {
-      document.getElementById('node-status-txt').innerText = "● Node Inactive";
+      document.getElementById('node-status-txt').innerText = "Inactive";
       document.getElementById('node-status-txt').style.color = "var(--accent-gold)";
       document.getElementById('mined-balance').innerText = "0.0000";
-      document.getElementById('mining-timer').innerText = "04:00:00 (Inactive)";
-      document.getElementById('progress-fill').style.width = "0%";
+      document.getElementById('mining-timer').innerText = "04:00:00";
       const mBtn = document.getElementById('mining-btn');
       mBtn.className = "btn-main btn-gold";
       mBtn.innerText = "⚡ Activate Node (0.05 TON)";
@@ -292,7 +339,7 @@
       return;
     }
 
-    document.getElementById('node-status-txt').innerText = "● Active Node";
+    document.getElementById('node-status-txt').innerText = "Active Node";
     document.getElementById('node-status-txt').style.color = "var(--accent-green)";
 
     const ratePerSec = MINING_SPEED / 3600;
@@ -303,10 +350,9 @@
       elapsedSec = CYCLE_SECONDS;
       const finalClaim = elapsedSec * ratePerSec;
       document.getElementById('mined-balance').innerText = finalClaim.toFixed(4);
-      document.getElementById('mining-timer').innerText = "00:00:00 (Ready)";
-      document.getElementById('progress-fill').style.width = "100%";
+      document.getElementById('mining-timer').innerText = "Ready to Claim";
       const mBtn = document.getElementById('mining-btn');
-      mBtn.className = "btn-main btn-claim";
+      mBtn.className = "btn-main btn-action";
       mBtn.innerText = "Claim " + finalClaim.toFixed(2) + " NEX";
     } else {
       const mined = elapsedSec * ratePerSec;
@@ -316,10 +362,9 @@
       const m = String(Math.floor((remainSec % 3600) / 60)).padStart(2, '0');
       const s = String(remainSec % 60).padStart(2, '0');
       document.getElementById('mining-timer').innerText = `${h}:${m}:${s}`;
-      document.getElementById('progress-fill').style.width = ((elapsedSec / CYCLE_SECONDS) * 100) + "%";
       const mBtn = document.getElementById('mining-btn');
-      mBtn.className = "btn-main btn-mining";
-      mBtn.innerText = "⛏️ Mining in Progress...";
+      mBtn.className = "btn-main btn-locked";
+      mBtn.innerText = "Mining Active...";
     }
     document.getElementById('total-balance').innerText = totalBalance.toFixed(4);
   }
@@ -327,19 +372,14 @@
   async function handleMiningAction() {
     if (!isNodeActive) {
       if (!tonConnectUI.connected) {
-        alert("Please connect your Tonkeeper wallet first!");
+        alert("Please connect your wallet first!");
         tonConnectUI.openModal();
         return;
       }
 
       const transaction = {
         validUntil: Math.floor(Date.now() / 1000) + 300,
-        messages: [
-          {
-            address: ADMIN_WALLET,
-            amount: "50000000" // 0.05 TON
-          }
-        ]
+        messages: [{ address: ADMIN_WALLET, amount: "50000000" }]
       };
 
       try {
@@ -348,7 +388,7 @@
         miningStart = Date.now();
         localStorage.setItem('nex_node_active', 'true');
         localStorage.setItem('nex_start', miningStart);
-        alert("Node Activated! Mining started.");
+        alert("Node Activated! Cloud mining started.");
         updateMiningUI();
       } catch (err) {
         alert("Transaction canceled: " + err.message);
@@ -389,7 +429,7 @@
 
       const d = document.createElement('div');
       d.className = `streak-day ${isClaimed ? 'claimed' : ''} ${isToday ? 'today' : ''}`;
-      d.innerHTML = `<div class="day-num">D${dayNum}</div><div class="day-reward">+${r}</div>`;
+      d.innerHTML = `<div>D${dayNum}</div><div style="font-weight:700;">+${r}</div>`;
       container.appendChild(d);
     });
 
@@ -397,7 +437,7 @@
     if (lastClaimDate === todayStr) {
       cBtn.disabled = true;
       cBtn.innerText = "Claimed for Today ✓";
-      cBtn.style.opacity = "0.6";
+      cBtn.style.opacity = "0.5";
     } else {
       cBtn.disabled = false;
       cBtn.innerText = `Claim Day ${streakDay} (+${dailyRewards[streakDay - 1]} NEX)`;
@@ -413,15 +453,11 @@
     localStorage.setItem('nex_last_streak_date', lastClaimDate);
     localStorage.setItem('nex_bal', totalBalance);
 
-    if (streakDay < 7) {
-      streakDay++;
-    } else {
-      streakDay = 1;
-    }
+    streakDay = streakDay < 7 ? streakDay + 1 : 1;
     localStorage.setItem('nex_streak_day', streakDay);
     renderStreak();
     updateMiningUI();
-    alert(`Success! +${reward} $NEX claimed!`);
+    alert(`Claimed +${reward} $NEX!`);
   }
   renderStreak();
 
@@ -429,18 +465,32 @@
   function handleTask(taskId, reward, link, btn) {
     if (localStorage.getItem('nex_done_' + taskId)) return;
     window.open(link, '_blank');
-    btn.innerText = "Verifying...";
+    btn.innerText = "...";
     setTimeout(() => {
       totalBalance += reward;
       localStorage.setItem('nex_bal', totalBalance);
       localStorage.setItem('nex_done_' + taskId, 'true');
       btn.className = "btn-task done";
-      btn.innerText = "Claimed ✓";
+      btn.innerText = "Done ✓";
       updateMiningUI();
-      alert(`+${reward} $NEX added!`);
-    }, 3000);
+    }, 2500);
   }
 
+  function handleWalletTask(btn) {
+    if (!tonConnectUI.connected) {
+      alert("Please connect your wallet first via the top button!");
+      tonConnectUI.openModal();
+    } else {
+      totalBalance += 200;
+      localStorage.setItem('nex_bal', totalBalance);
+      btn.className = "btn-task done";
+      btn.innerText = "Done ✓";
+      updateMiningUI();
+      alert("Wallet Verified: +200 $NEX added!");
+    }
+  }
+
+  // Navigation
   function switchTab(tabId, el) {
     document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
     document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
@@ -448,10 +498,11 @@
     el.classList.add('active');
   }
 
-  const refLink = `https://t.me/NEXORA_Crypto_Mining_Bot?start=nex_${telegramUserId}`;
-  document.getElementById('ref-link-display').innerText = refLink;
+  // Referrals
+  const refLink = `https://t.me/NEXORA_Crypto_Mining_Bot?start=${telegramUserId}`;
+  document.getElementById('ref-link-display').value = refLink;
   function shareRefTelegram() {
-    window.open(`https://t.me/share/url?url=${encodeURIComponent(refLink)}&text=${encodeURIComponent("⚡ Mine NEXORA ($NEX) on TON! Launching Jan 1, 2027:")}`);
+    window.open(`https://t.me/share/url?url=${encodeURIComponent(refLink)}&text=${encodeURIComponent("⚡ Claim NEXORA ($NEX) Airdrop & Cloud Mine on TON:")}`);
   }
 </script>
 </body>
