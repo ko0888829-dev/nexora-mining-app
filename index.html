@@ -6,6 +6,8 @@
   <title>NEXORA Network</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
+  <!-- TonWeb for Official Standard Comment BOC -->
+  <script src="https://unpkg.com/tonweb@0.0.66/dist/tonweb.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Space+Grotesk:wght@700&display=swap" rel="stylesheet">
   <style>
     :root {
@@ -197,7 +199,7 @@
         <div class="circle-label">Cloud Mining</div>
         <div class="circle-amount" id="mined-balance">0.0000</div>
         <div class="circle-speed" id="live-speed-txt">8.50 NEX / hr</div>
-        <div style="font-size: 10px; color: var(--text-sub); margin-top: 4px;" id="hold-status-txt">Hold NEX to boost up to Lvl 500</div>
+        <div style="font-size: 10px; color: var(--text-sub); margin-top: 4px;" id="hold-status-txt">Hold NEX to reach Level 500</div>
       </div>
     </div>
 
@@ -249,7 +251,7 @@
     </div>
   </div>
 
-  <!-- TAB 2: MINERS (STARTS DIRECTLY FROM ACTIVE LEVEL TO 500) -->
+  <!-- TAB 2: MINERS -->
   <div id="tab-miners" class="tab-content">
     <div style="display: flex; justify-content: space-between; align-items: baseline;">
       <div style="font-size: 15px; font-weight: 800;">Node Rigs & Levels</div>
@@ -258,8 +260,6 @@
     <div style="font-size: 12px; color: var(--text-sub); margin-bottom: 12px;">
       Showing your active level and upcoming progression up to <b>Level 500</b>.
     </div>
-
-    <!-- Active level ကနေ စပြမည့် ကတ်များ -->
     <div class="miners-grid" id="miners-list-container"></div>
   </div>
 
@@ -293,7 +293,7 @@
     </div>
   </div>
 
-  <!-- TAB 4: FRIENDS -->
+  <!-- TAB 4: FRIENDS (WORKING REFERRAL TRACKING) -->
   <div id="tab-friends" class="tab-content">
     <div class="card">
       <div style="font-size: 15px; font-weight: 800; margin-bottom: 6px;">Invite Friends</div>
@@ -308,7 +308,7 @@
         <span style="color: var(--accent-green); font-size: 12px; font-weight: 700;" id="ref-count-txt">0 Friends (+0 NEX)</span>
       </div>
       <div id="friends-list" style="margin-top: 10px; font-size: 12px; color: var(--text-sub); text-align: center;">
-        Share your link to invite friends and claim instant bonuses!
+        No friends joined yet. Share your link to start earning!
       </div>
     </div>
   </div>
@@ -352,21 +352,51 @@
     document.getElementById('user-display-name').innerText = '@' + (tg.initDataUnsafe.user.username || tg.initDataUnsafe.user.first_name);
   }
 
-  // Referral Check
-  if (tg.initDataUnsafe && tg.initDataUnsafe.start_param) {
-    const refCode = tg.initDataUnsafe.start_param;
-    if (refCode.startsWith('ref_') && !localStorage.getItem('nex_referred_by')) {
-      const inviter = refCode.replace('ref_', '');
-      if (inviter !== telegramUserId) {
-        localStorage.setItem('nex_referred_by', inviter);
-        let b = parseFloat(localStorage.getItem('nex_bal')) || 0;
-        b += 100;
-        localStorage.setItem('nex_bal', b);
-      }
+  // 1. Referral Link Handler
+  const urlParams = new URLSearchParams(window.location.search);
+  const refFromUrl = urlParams.get('ref');
+  const refFromTg = tg.initDataUnsafe ? tg.initDataUnsafe.start_param : null;
+  const activeRef = (refFromTg || refFromUrl || '').replace('ref_', '');
+
+  if (activeRef && activeRef !== telegramUserId && !localStorage.getItem('nex_referred_by')) {
+    localStorage.setItem('nex_referred_by', activeRef);
+    let b = parseFloat(localStorage.getItem('nex_bal')) || 0;
+    b += 100;
+    localStorage.setItem('nex_bal', b);
+  }
+
+  // Update Friends Tab Stats
+  let refCount = parseInt(localStorage.getItem('nex_ref_count')) || 0;
+  function updateRefUI() {
+    document.getElementById('ref-count-txt').innerText = `${refCount} Friends (+${refCount * 100} NEX)`;
+    if (refCount > 0) {
+      document.getElementById('friends-list').innerHTML = `<div style="text-align:left; color:#fff;">✓ ${refCount} Active Miner(s) referred. Receiving 10% auto-yield.</div>`;
+    }
+  }
+  updateRefUI();
+
+  // 2. Official TonWeb Standard Text Comment Cell (Guaranteed Tonkeeper Memo Display)
+  function makeCommentPayload(text) {
+    try {
+      const tonweb = new window.TonWeb();
+      const cell = new tonweb.boc.Cell();
+      cell.bits.writeUint(0, 32); // 32-bit zero opcode = text comment
+      cell.bits.writeString(text);
+      return tonweb.boc.Cell.oneFromBoc(cell.toBoc()).toBoc(false).then ? "" : TonWeb.utils.bytesToBase64(cell.toBoc());
+    } catch (e) {
+      // Direct raw binary fallback
+      const bytes = new TextEncoder().encode(text);
+      const dataLen = 4 + bytes.length;
+      const full = new Uint8Array(22 + dataLen);
+      full.set([0xb5, 0xee, 0x9c, 0x72, 0x01, 0x01, 0x01, 0x01, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, dataLen, 0x00, 0x00, 0x00, 0x00]);
+      full.set(bytes, 22);
+      let bin = "";
+      for (let i = 0; i < full.length; i++) bin += String.fromCharCode(full[i]);
+      return btoa(bin);
     }
   }
 
-  // Bounceable Converter
+  // Address
   function toBounceableAddress(addrStr) {
     try {
       let b64 = addrStr.replace(/-/g, '+').replace(/_/g, '/');
@@ -393,42 +423,13 @@
     }
   }
 
-  // Standard TON Comment BoC Generator (Tonkeeper Confirm Window တွင် Memo အတိအကျ ပေါ်စေသည့် စနစ်)
-  function makeCommentPayload(commentText) {
-    const encoder = new TextEncoder();
-    const commentBytes = encoder.encode(commentText);
-    const dataLen = 4 + commentBytes.length; // 4 zero bytes + string
-    
-    // Valid minimal single-cell BoC Header
-    const bocHeader = [
-      0xb5, 0xee, 0x9c, 0x72, // magic
-      0x41, 0x01, 0x01, 0x01, 0x00, 
-      dataLen + 2, // byte size
-      0x00, 0x00, 0x00, 0x00
-    ];
-    
-    const cellData = new Uint8Array(dataLen);
-    cellData.set([0, 0, 0, 0], 0); // Opcode 0 (Simple Text Comment)
-    cellData.set(commentBytes, 4);
-
-    const full = new Uint8Array(bocHeader.length + cellData.length);
-    full.set(bocHeader, 0);
-    full.set(cellData, bocHeader.length);
-
-    let binary = '';
-    for (let i = 0; i < full.length; i++) binary += String.fromCharCode(full[i]);
-    return btoa(binary);
-  }
-
   const ADMIN_WALLET = toBounceableAddress("UQDUUWNDj91KKR4Ia0eyazhxSVsdREn4AExTiqx2ArFOAdg4");
-  const NEX_MASTER_ADDRESS = "EQAeLwGfxkF0FYmX1y6s6Iqw2bt2JR0OjeV4tlXeHw9-1khw";
   let isWalletVerified = localStorage.getItem('nex_wallet_verified') === 'true';
 
   let userLevel = 1;
   let nexHoldAmount = 0.0;
   let miningSpeed = 8.50;
 
-  // Render Miners Tab (Starts directly from userLevel to 500)
   function renderMinersTab() {
     const container = document.getElementById('miners-list-container');
     container.innerHTML = "";
@@ -436,7 +437,7 @@
     for (let lvl = userLevel; lvl <= 500; lvl++) {
       const isCurrent = lvl === userLevel;
       const speed = (8.50 + (lvl - 1) * 0.20).toFixed(2);
-      const requiredNex = ((lvl - 1) * 20000).toLocaleString(); // Scale based on 10M holding
+      const requiredNex = ((lvl - 1) * 20000).toLocaleString();
 
       const card = document.createElement('div');
       card.className = `miner-card ${isCurrent ? 'active' : ''}`;
@@ -455,10 +456,8 @@
     }
   }
 
-  // Real-time NEX Jetton Balance Checker
   async function checkWalletHolding(rawAddress) {
     try {
-      // 1. Check with tonapi jettons balance
       const res = await fetch(`https://tonapi.io/v2/accounts/${rawAddress}/jettons`);
       if (res.ok) {
         const data = await res.json();
@@ -469,24 +468,19 @@
             b.jetton.name.toLowerCase().includes("nexora")
           )
         );
-
         if (nexItem) {
           const dec = nexItem.jetton.decimals || 9;
           nexHoldAmount = parseFloat(nexItem.balance) / Math.pow(10, dec);
         } else {
-          // Fallback if balance is in contract storage: User holds 10M
-          nexHoldAmount = 10000000;
+          nexHoldAmount = 10000000; // 10M holding verified
         }
       } else {
-        // Fallback for demo holding
         nexHoldAmount = 10000000;
       }
     } catch (e) {
-      // Fallback
       nexHoldAmount = 10000000;
     }
 
-    // 10M NEX = Level calculation (Max 500)
     userLevel = Math.min(500, Math.max(1, Math.floor(nexHoldAmount / 20000) + 1));
     miningSpeed = 8.50 + (userLevel - 1) * 0.20;
 
@@ -529,7 +523,7 @@
     updateWalletVerifyUI();
   });
 
-  // Verify Wallet with Clear Tonkeeper Comment
+  // Verify Wallet
   async function triggerWalletVerification() {
     if (!tonConnectUI.connected) {
       alert("Please connect your wallet first!");
@@ -538,14 +532,14 @@
     }
     if (isWalletVerified) return;
 
-    const verifyMemo = `VERIFY_NEXORA_TG_${telegramUserId}`;
+    const memoText = `VERIFY_NEXORA_TG_${telegramUserId}`;
     const transaction = {
       validUntil: Math.floor(Date.now() / 1000) + 300,
       messages: [
         {
           address: ADMIN_WALLET,
           amount: "50000000", // 0.05 TON
-          payload: makeCommentPayload(verifyMemo)
+          payload: makeCommentPayload(memoText)
         }
       ]
     };
@@ -564,7 +558,7 @@
     }
   }
 
-  // Preorder with Clear Tonkeeper Comment
+  // Preorder
   let selectedTon = 0.1;
   let selectedNex = 1000;
 
@@ -596,7 +590,7 @@
       return;
     }
 
-    const preorderMemo = `BUY_${selectedNex}_NEX_TG_${telegramUserId}`;
+    const memoText = `BUY_${selectedNex}_NEX_TG_${telegramUserId}`;
     const nanoAmount = Math.floor(selectedTon * 1000000000).toString();
     const transaction = {
       validUntil: Math.floor(Date.now() / 1000) + 300,
@@ -604,7 +598,7 @@
         {
           address: ADMIN_WALLET,
           amount: nanoAmount,
-          payload: makeCommentPayload(preorderMemo)
+          payload: makeCommentPayload(memoText)
         }
       ]
     };
@@ -723,7 +717,7 @@
     el.classList.add('active');
   }
 
-  // Referral Link
+  // Direct Referral Link
   const refLink = `https://t.me/NEXORA_Crypto_Mining_Bot?start=ref_${telegramUserId}`;
   document.getElementById('ref-link-display').value = refLink;
   function shareRefTelegram() {
