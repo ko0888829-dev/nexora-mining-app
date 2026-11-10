@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <title>NEXORA Mining & Preorder</title>
+  <title>NEXORA Network</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Space+Grotesk:wght@700&display=swap" rel="stylesheet">
@@ -126,18 +126,10 @@
     .form-label { font-size: 11px; color: var(--text-sub); display: block; margin-bottom: 4px; }
     .form-input { width: 100%; background: #080d16; border: 1px solid var(--card-border); border-radius: 10px; padding: 12px; color: #fff; font-size: 13px; outline: none; }
 
-    /* Bottom Nav Bar */
-    .tab-content { display: none; }
-    .tab-content.active { display: block; }
-    .nav-bar { position: fixed; bottom: 0; left: 0; width: 100%; background: #070b12; border-top: 1px solid var(--card-border); display: flex; justify-content: space-around; padding: 10px 0; z-index: 100; }
-    .nav-item { display: flex; flex-direction: column; align-items: center; gap: 4px; color: var(--text-sub); font-size: 11px; cursor: pointer; flex: 1; text-align: center; }
-    .nav-item.active { color: var(--accent-gold); font-weight: 700; }
-    .nav-icon { font-size: 18px; }
-
-    /* Miners Grid */
+    /* ATF Miners Grid */
     .miners-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
-    .miner-card { background: #0d131f; border: 1px solid var(--card-border); border-radius: 16px; padding: 14px; text-align: center; }
-    .miner-card.active { border-color: var(--accent-green); }
+    .miner-card { background: #0d131f; border: 1px solid var(--card-border); border-radius: 16px; padding: 14px; text-align: center; position: relative; }
+    .miner-card.active { border-color: var(--accent-green); box-shadow: 0 0 15px rgba(0, 230, 118, 0.15); }
     .btn-miner { width: 100%; padding: 8px; border-radius: 10px; border: none; font-size: 11px; font-weight: 800; text-transform: uppercase; cursor: pointer; background: #182234; color: var(--accent-gold); }
     .btn-miner.active { background: rgba(0, 230, 118, 0.2); color: var(--accent-green); cursor: default; }
 
@@ -147,6 +139,14 @@
     .streak-day { background: #080d16; border: 1px solid var(--card-border); border-radius: 8px; padding: 6px 2px; text-align: center; font-size: 9px; }
     .streak-day.claimed { border-color: var(--accent-green); color: var(--accent-green); }
     .streak-day.today { border-color: var(--accent-gold); }
+
+    /* Bottom Nav Bar */
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+    .nav-bar { position: fixed; bottom: 0; left: 0; width: 100%; background: #070b12; border-top: 1px solid var(--card-border); display: flex; justify-content: space-around; padding: 10px 0; z-index: 100; }
+    .nav-item { display: flex; flex-direction: column; align-items: center; gap: 4px; color: var(--text-sub); font-size: 11px; cursor: pointer; flex: 1; text-align: center; }
+    .nav-item.active { color: var(--accent-gold); font-weight: 700; }
+    .nav-icon { font-size: 18px; }
   </style>
 </head>
 <body>
@@ -177,7 +177,7 @@
     <div class="pnl-card">
       <div class="pnl-top">
         <span style="font-size: 12px; font-weight: 800; color: #fff;">NEXORA MINER • 24H</span>
-        <span class="pnl-badge">Level 1 • Active</span>
+        <span class="pnl-badge" id="pnl-level-badge">Level 1 • Active</span>
       </div>
       <div style="font-size: 11px; color: var(--text-sub); margin-bottom: 4px;">Total Balance</div>
       <div class="balance-display">+<span id="total-balance">0.0000</span> <span style="font-size: 18px; color: #fff;">NEX</span></div>
@@ -188,8 +188,8 @@
       <div class="circle-outer">
         <div class="circle-label">Cloud Mining</div>
         <div class="circle-amount" id="mined-balance">0.0000</div>
-        <div class="circle-speed">8.50 NEX / hr</div>
-        <div style="font-size: 10px; color: var(--text-sub); margin-top: 4px;">Live Accumulating...</div>
+        <div class="circle-speed" id="live-speed-txt">8.50 NEX / hr</div>
+        <div style="font-size: 10px; color: var(--text-sub); margin-top: 4px;" id="hold-status-txt">Hold TON to boost up to Lvl 500</div>
       </div>
     </div>
 
@@ -205,10 +205,9 @@
         <span style="font-size: 11px; color: var(--accent-cyan); font-weight: 700;">Stage 1 Pre-Sale</span>
       </div>
       <p style="font-size: 12px; color: var(--text-sub); margin: 6px 0 10px;">
-        Exchange TON/Gram to secure allocations before January 1, 2027 listing.
+        Exchange TON to secure allocations before January 1, 2027 listing.
       </p>
 
-      <!-- Preorder Preset Grid -->
       <div class="preorder-grid">
         <div class="preorder-item selected" onclick="selectTier(0.1, 1000, this)">
           <div class="preorder-ton">0.1 TON</div>
@@ -232,7 +231,6 @@
         </div>
       </div>
 
-      <!-- Custom Pre-order Amount -->
       <div class="form-group">
         <label class="form-label">Or Custom TON Amount:</label>
         <input type="number" id="custom-ton-input" class="form-input" placeholder="e.g. 2.5" oninput="calculateCustomNEX(this.value)">
@@ -244,27 +242,18 @@
     </div>
   </div>
 
-  <!-- TAB 2: MINERS -->
+  <!-- TAB 2: MINERS (DYNAMIC PROGRESSION UP TO LEVEL 500) -->
   <div id="tab-miners" class="tab-content">
-    <div style="font-size: 14px; font-weight: 800; margin-bottom: 4px;">Node Rigs & Levels</div>
-    <div style="font-size: 12px; color: var(--text-sub); margin-bottom: 12px;">Hold or spend NEX to boost hashrate capacity.</div>
+    <div style="display: flex; justify-content: space-between; align-items: baseline;">
+      <div style="font-size: 15px; font-weight: 800;">Node Rigs & Levels</div>
+      <div style="font-size: 12px; color: var(--accent-gold); font-weight: 800;" id="user-holding-txt">Holding: 0 TON</div>
+    </div>
+    <div style="font-size: 12px; color: var(--text-sub); margin-bottom: 12px;">
+      Levels scale up to <b>Level 500</b> automatically based on TON held in your connected wallet.
+    </div>
 
-    <div class="miners-grid">
-      <div class="miner-card active">
-        <div style="font-size: 11px; color: var(--accent-green); font-weight: 800;">Lvl 1</div>
-        <div style="font-size: 30px; margin: 8px 0;">📦</div>
-        <div style="font-size: 18px; font-weight: 800; color: var(--accent-green);">Active</div>
-        <div style="font-size: 11px; color: var(--text-sub); margin-bottom: 8px;">Speed 8.50 NEX/h</div>
-        <button class="btn-miner active">ACTIVE</button>
-      </div>
-
-      <div class="miner-card">
-        <div style="font-size: 11px; color: var(--text-sub); font-weight: 800;">Lvl 2</div>
-        <div style="font-size: 30px; margin: 8px 0;">⚡</div>
-        <div style="font-size: 18px; font-weight: 800; color: var(--accent-gold);">25.0 $</div>
-        <div style="font-size: 11px; color: var(--text-sub); margin-bottom: 8px;">Speed 18.50 NEX/h</div>
-        <button class="btn-miner" onclick="alert('Requires 2,500 NEX or VIP status!')">🔒 NEED 2,500 NEX</button>
-      </div>
+    <div class="miners-grid" id="miners-list-container">
+      <!-- Dynamic Level Cards Rendered Here -->
     </div>
   </div>
 
@@ -347,11 +336,98 @@
     document.getElementById('user-display-name').innerText = '@' + (tg.initDataUnsafe.user.username || tg.initDataUnsafe.user.first_name);
   }
 
-  // TON Standard Raw Format (Validation Error မတက်စေရန်)
-  // UQDUUWNDj91KKR4Ia0eyazhxSVsdREn4AExTiqx2ArFOAdg4 -> 0:d54545cd0e3f7528a47821ad1ec9ac61c9256c751127e001314e2ab1d80ac538
-  const ADMIN_RAW_ADDRESS = "0:d54545cd0e3f7528a47821ad1ec9ac61c9256c751127e001314e2ab1d80ac538";
+  // TON Address Checksum Converter (SDK Validation Error အား လုံးဝရှင်းလင်းပေးသည်)
+  function toBounceableAddress(addrStr) {
+    try {
+      let b64 = addrStr.replace(/-/g, '+').replace(/_/g, '/');
+      while (b64.length % 4) b64 += '=';
+      const binary = atob(b64);
+      const bytes = new Uint8Array(binary.length);
+      for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+      
+      bytes[0] = 0x11; // Standard bounceable flag
+      
+      let crc = 0;
+      for (let i = 0; i < 34; i++) {
+        crc ^= (bytes[i] << 8);
+        for (let j = 0; j < 8; j++) {
+          crc = (crc & 0x8000) ? ((crc << 1) ^ 0x1021) : (crc << 1);
+          crc &= 0xffff;
+        }
+      }
+      bytes[34] = (crc >> 8) & 0xff;
+      bytes[35] = crc & 0xff;
+      
+      let res = "";
+      for (let i = 0; i < bytes.length; i++) res += String.fromCharCode(bytes[i]);
+      return btoa(res).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+    } catch (e) {
+      return addrStr;
+    }
+  }
+
+  // သင့် Wallet Address အား Valid Bounceable Format သို့ ပြောင်းလဲခြင်း
+  const ADMIN_WALLET = toBounceableAddress("UQDUUWNDj91KKR4Ia0eyazhxSVsdREn4AExTiqx2ArFOAdg4");
   let isWalletVerified = localStorage.getItem('nex_wallet_verified') === 'true';
 
+  // 1. Level System up to Level 500 (Holding TON in Wallet)
+  let userLevel = 1;
+  let tonHoldAmount = 0.0;
+  let miningSpeed = 8.50;
+
+  function renderMinersTab() {
+    const container = document.getElementById('miners-list-container');
+    container.innerHTML = "";
+
+    // Show current level and upcoming level tiers up to 500
+    const levelsToShow = [userLevel, userLevel + 1, userLevel + 2, userLevel + 5, userLevel + 20, 500].filter((v, i, a) => a.indexOf(v) === i && v <= 500);
+
+    levelsToShow.forEach(lvl => {
+      const isCurrent = lvl === userLevel;
+      const speed = (8.50 + (lvl - 1) * 0.15).toFixed(2);
+      const requiredTon = ((lvl - 1) * 0.02).toFixed(2);
+
+      const card = document.createElement('div');
+      card.className = `miner-card ${isCurrent ? 'active' : ''}`;
+      card.innerHTML = `
+        <div style="font-size: 11px; color: ${isCurrent ? 'var(--accent-green)' : 'var(--text-sub)'}; font-weight: 800;">Lvl ${lvl}</div>
+        <div style="font-size: 28px; margin: 6px 0;">${isCurrent ? '⚡' : (lvl === 500 ? '👑' : '📦')}</div>
+        <div style="font-size: 16px; font-weight: 800; color: ${isCurrent ? 'var(--accent-green)' : 'var(--accent-gold)'};">
+          ${isCurrent ? 'ACTIVE' : `Hold ${requiredTon} TON`}
+        </div>
+        <div style="font-size: 11px; color: var(--text-sub); margin: 4px 0 8px;">Speed ${speed} NEX/h</div>
+        <button class="btn-miner ${isCurrent ? 'active' : ''}">
+          ${isCurrent ? 'MINING ACTIVE' : `🔒 NEED LVL ${lvl}`}
+        </button>
+      `;
+      container.appendChild(card);
+    });
+  }
+
+  async function checkWalletHolding(rawAddress) {
+    try {
+      const res = await fetch(`https://tonapi.io/v2/accounts/${rawAddress}`);
+      if (res.ok) {
+        const data = await res.json();
+        const nano = data.balance || 0;
+        tonHoldAmount = parseFloat((nano / 1000000000).toFixed(4));
+        
+        // Every 0.02 TON held = +1 Level (Max Level 500)
+        userLevel = Math.min(500, Math.max(1, Math.floor(tonHoldAmount / 0.02) + 1));
+        miningSpeed = 8.50 + (userLevel - 1) * 0.15;
+
+        document.getElementById('user-holding-txt').innerText = `Holding: ${tonHoldAmount} TON`;
+        document.getElementById('pnl-level-badge').innerText = `Level ${userLevel} • Active`;
+        document.getElementById('live-speed-txt').innerText = `${miningSpeed.toFixed(2)} NEX / hr`;
+        document.getElementById('hold-status-txt').innerText = `Level ${userLevel}/500 (Holding ${tonHoldAmount} TON)`;
+        renderMinersTab();
+      }
+    } catch (e) {
+      console.log("Holding check fallback:", e);
+    }
+  }
+
+  // TON Connect
   const tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
     manifestUrl: window.location.origin + '/tonconnect-manifest.json',
     buttonRootId: 'ton-connect-btn'
@@ -378,11 +454,12 @@
   tonConnectUI.onStatusChange(wallet => {
     if (wallet) {
       document.getElementById('withdraw-addr').value = wallet.account.address;
+      checkWalletHolding(wallet.account.address);
     }
     updateWalletVerifyUI();
   });
 
-  // 1. Verify Wallet Function
+  // 2. Verify Wallet Function
   async function triggerWalletVerification() {
     if (!tonConnectUI.connected) {
       alert("Please connect your wallet first!");
@@ -393,12 +470,7 @@
 
     const transaction = {
       validUntil: Math.floor(Date.now() / 1000) + 300,
-      messages: [
-        {
-          address: ADMIN_RAW_ADDRESS,
-          amount: "50000000" // 0.05 TON in nanoton
-        }
-      ]
+      messages: [{ address: ADMIN_WALLET, amount: "50000000" }]
     };
 
     try {
@@ -415,7 +487,7 @@
     }
   }
 
-  // 2. Preorder Logic
+  // 3. Preorder Logic
   let selectedTon = 0.1;
   let selectedNex = 1000;
 
@@ -434,7 +506,7 @@
     if (!isNaN(ton) && ton > 0) {
       document.querySelectorAll('.preorder-item').forEach(i => i.classList.remove('selected'));
       selectedTon = ton;
-      selectedNex = Math.floor(ton * 10000); // 0.1 TON = 1,000 NEX -> 1 TON = 10,000 NEX
+      selectedNex = Math.floor(ton * 10000);
       document.getElementById('preorder-ton-amount').innerText = ton;
       document.getElementById('preorder-nex-amount').innerText = selectedNex.toLocaleString();
     }
@@ -450,12 +522,7 @@
     const nanoAmount = Math.floor(selectedTon * 1000000000).toString();
     const transaction = {
       validUntil: Math.floor(Date.now() / 1000) + 300,
-      messages: [
-        {
-          address: ADMIN_RAW_ADDRESS,
-          amount: nanoAmount
-        }
-      ]
+      messages: [{ address: ADMIN_WALLET, amount: nanoAmount }]
     };
 
     try {
@@ -469,16 +536,14 @@
     }
   }
 
-  // 3. Anytime Mining Loop
-  const MINING_SPEED = 8.50; // Per hour
+  // 4. Anytime Mining Loop
   let totalBalance = parseFloat(localStorage.getItem('nex_bal')) || 0.0;
   let miningStart = parseInt(localStorage.getItem('nex_start')) || Date.now();
   localStorage.setItem('nex_start', miningStart);
-
   let currentMined = 0;
 
   function updateMining() {
-    const ratePerSec = MINING_SPEED / 3600;
+    const ratePerSec = miningSpeed / 3600;
     const now = Date.now();
     let elapsedSec = Math.floor((now - miningStart) / 1000);
     currentMined = elapsedSec * ratePerSec;
@@ -502,6 +567,7 @@
 
   setInterval(updateMining, 1000);
   updateMining();
+  renderMinersTab();
 
   // Streak
   const dailyRewards = [25, 35, 50, 75, 100, 150, 250];
