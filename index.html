@@ -6,7 +6,6 @@
   <title>NEXORA Network</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
-  <!-- TonWeb for Official Standard Comment BOC -->
   <script src="https://unpkg.com/tonweb@0.0.66/dist/tonweb.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Space+Grotesk:wght@700&display=swap" rel="stylesheet">
   <style>
@@ -128,7 +127,7 @@
     .form-label { font-size: 11px; color: var(--text-sub); display: block; margin-bottom: 4px; }
     .form-input { width: 100%; background: #080d16; border: 1px solid var(--card-border); border-radius: 10px; padding: 12px; color: #fff; font-size: 13px; outline: none; }
 
-    /* Miners Grid (Starts from Current Level to 500) */
+    /* Miners Grid */
     .miners-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -293,7 +292,7 @@
     </div>
   </div>
 
-  <!-- TAB 4: FRIENDS (WORKING REFERRAL TRACKING) -->
+  <!-- TAB 4: FRIENDS -->
   <div id="tab-friends" class="tab-content">
     <div class="card">
       <div style="font-size: 15px; font-weight: 800; margin-bottom: 6px;">Invite Friends</div>
@@ -352,39 +351,105 @@
     document.getElementById('user-display-name').innerText = '@' + (tg.initDataUnsafe.user.username || tg.initDataUnsafe.user.first_name);
   }
 
-  // 1. Referral Link Handler
+  // Mining State
+  let totalBalance = parseFloat(localStorage.getItem('nex_bal')) || 0.0;
+  let miningStart = parseInt(localStorage.getItem('nex_start')) || Date.now();
+  localStorage.setItem('nex_start', miningStart);
+  let currentMined = 0;
+  let userLevel = 1;
+  let nexHoldAmount = 0.0;
+  let miningSpeed = 8.50;
+
+  function updateMining() {
+    const ratePerSec = miningSpeed / 3600;
+    const now = Date.now();
+    let elapsedSec = Math.floor((now - miningStart) / 1000);
+    currentMined = elapsedSec * ratePerSec;
+
+    document.getElementById('mined-balance').innerText = currentMined.toFixed(4);
+    document.getElementById('total-balance').innerText = totalBalance.toFixed(4);
+  }
+
+  function claimMinedTokens() {
+    if (currentMined <= 0.0001) {
+      alert("Mining is just starting! Please wait a moment to accumulate NEX.");
+      return;
+    }
+    totalBalance += currentMined;
+    miningStart = Date.now();
+    localStorage.setItem('nex_bal', totalBalance);
+    localStorage.setItem('nex_start', miningStart);
+    alert(`Claimed +${currentMined.toFixed(4)} $NEX successfully!`);
+    updateMining();
+  }
+
+  // Server-Synced Referral System
+  const BOT_USERNAME = "NEXORA_Crypto_Mining_Bot"; // သင့် Bot ၏ @username အမှန်ထည့်ပါ
   const urlParams = new URLSearchParams(window.location.search);
   const refFromUrl = urlParams.get('ref');
   const refFromTg = tg.initDataUnsafe ? tg.initDataUnsafe.start_param : null;
-  const activeRef = (refFromTg || refFromUrl || '').replace('ref_', '');
+  const activeRef = (refFromTg || refFromUrl || '').replace('ref_', '').trim();
+  const currentUsername = tg.initDataUnsafe?.user?.username
+    ? '@' + tg.initDataUnsafe.user.username
+    : (tg.initDataUnsafe?.user?.first_name || 'Miner');
 
-  if (activeRef && activeRef !== telegramUserId && !localStorage.getItem('nex_referred_by')) {
-    localStorage.setItem('nex_referred_by', activeRef);
-    let b = parseFloat(localStorage.getItem('nex_bal')) || 0;
-    b += 100;
-    localStorage.setItem('nex_bal', b);
-  }
+  async function syncReferrals() {
+    try {
+      if (activeRef && activeRef !== telegramUserId && !localStorage.getItem('nex_ref_synced')) {
+        const postRes = await fetch('/api/ref', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ userId: telegramUserId, referrerId: activeRef, username: currentUsername })
+        });
+        const postData = await postRes.json();
+        if (postData.ok) {
+          localStorage.setItem('nex_ref_synced', 'true');
+          if (postData.newlyReferred) {
+            totalBalance += 100;
+            localStorage.setItem('nex_bal', totalBalance);
+            updateMining();
+          }
+        }
+      }
 
-  // Update Friends Tab Stats
-  let refCount = parseInt(localStorage.getItem('nex_ref_count')) || 0;
-  function updateRefUI() {
-    document.getElementById('ref-count-txt').innerText = `${refCount} Friends (+${refCount * 100} NEX)`;
-    if (refCount > 0) {
-      document.getElementById('friends-list').innerHTML = `<div style="text-align:left; color:#fff;">✓ ${refCount} Active Miner(s) referred. Receiving 10% auto-yield.</div>`;
+      const res = await fetch(`/api/ref?userId=${telegramUserId}`);
+      const data = await res.json();
+      if (data.ok) {
+        const prevCount = parseInt(localStorage.getItem('nex_known_ref_count')) || 0;
+        if (data.refCount > prevCount) {
+          const newJoins = data.refCount - prevCount;
+          totalBalance += newJoins * 100;
+          localStorage.setItem('nex_bal', totalBalance);
+          localStorage.setItem('nex_known_ref_count', data.refCount);
+          updateMining();
+        }
+
+        document.getElementById('ref-count-txt').innerText = `${data.refCount} Friends (+${data.refBonus} NEX)`;
+        const listEl = document.getElementById('friends-list');
+        if (data.friends && data.friends.length > 0) {
+          listEl.innerHTML = data.friends.map(f =>
+            `<div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid #1a2536; color:#fff;">
+              <span>👤 ${f.username || 'User ' + f.userId}</span>
+              <span style="color:var(--accent-green); font-weight:700;">+100 NEX</span>
+            </div>`
+          ).join('');
+        }
+      }
+    } catch (e) {
+      console.error('Ref sync error:', e);
     }
   }
-  updateRefUI();
+  syncReferrals();
 
-  // 2. Official TonWeb Standard Text Comment Cell (Guaranteed Tonkeeper Memo Display)
+  // Official TonWeb Standard Text Comment Cell
   function makeCommentPayload(text) {
     try {
       const tonweb = new window.TonWeb();
       const cell = new tonweb.boc.Cell();
-      cell.bits.writeUint(0, 32); // 32-bit zero opcode = text comment
+      cell.bits.writeUint(0, 32);
       cell.bits.writeString(text);
-      return tonweb.boc.Cell.oneFromBoc(cell.toBoc()).toBoc(false).then ? "" : TonWeb.utils.bytesToBase64(cell.toBoc());
+      return TonWeb.utils.bytesToBase64(cell.toBoc());
     } catch (e) {
-      // Direct raw binary fallback
       const bytes = new TextEncoder().encode(text);
       const dataLen = 4 + bytes.length;
       const full = new Uint8Array(22 + dataLen);
@@ -396,7 +461,6 @@
     }
   }
 
-  // Address
   function toBounceableAddress(addrStr) {
     try {
       let b64 = addrStr.replace(/-/g, '+').replace(/_/g, '/');
@@ -425,10 +489,6 @@
 
   const ADMIN_WALLET = toBounceableAddress("UQDUUWNDj91KKR4Ia0eyazhxSVsdREn4AExTiqx2ArFOAdg4");
   let isWalletVerified = localStorage.getItem('nex_wallet_verified') === 'true';
-
-  let userLevel = 1;
-  let nexHoldAmount = 0.0;
-  let miningSpeed = 8.50;
 
   function renderMinersTab() {
     const container = document.getElementById('miners-list-container');
@@ -472,13 +532,11 @@
           const dec = nexItem.jetton.decimals || 9;
           nexHoldAmount = parseFloat(nexItem.balance) / Math.pow(10, dec);
         } else {
-          nexHoldAmount = 10000000; // 10M holding verified
+          nexHoldAmount = 0.0;
         }
-      } else {
-        nexHoldAmount = 10000000;
       }
     } catch (e) {
-      nexHoldAmount = 10000000;
+      console.log('Jetton check error:', e);
     }
 
     userLevel = Math.min(500, Math.max(1, Math.floor(nexHoldAmount / 20000) + 1));
@@ -491,7 +549,6 @@
     renderMinersTab();
   }
 
-  // TON Connect
   const tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
     manifestUrl: window.location.origin + '/tonconnect-manifest.json',
     buttonRootId: 'ton-connect-btn'
@@ -523,7 +580,6 @@
     updateWalletVerifyUI();
   });
 
-  // Verify Wallet
   async function triggerWalletVerification() {
     if (!tonConnectUI.connected) {
       alert("Please connect your wallet first!");
@@ -538,7 +594,7 @@
       messages: [
         {
           address: ADMIN_WALLET,
-          amount: "50000000", // 0.05 TON
+          amount: "50000000",
           payload: makeCommentPayload(memoText)
         }
       ]
@@ -558,7 +614,6 @@
     }
   }
 
-  // Preorder
   let selectedTon = 0.1;
   let selectedNex = 1000;
 
@@ -612,35 +667,6 @@
     } catch (err) {
       alert("Preorder canceled: " + err.message);
     }
-  }
-
-  // Mining Loop
-  let totalBalance = parseFloat(localStorage.getItem('nex_bal')) || 0.0;
-  let miningStart = parseInt(localStorage.getItem('nex_start')) || Date.now();
-  localStorage.setItem('nex_start', miningStart);
-  let currentMined = 0;
-
-  function updateMining() {
-    const ratePerSec = miningSpeed / 3600;
-    const now = Date.now();
-    let elapsedSec = Math.floor((now - miningStart) / 1000);
-    currentMined = elapsedSec * ratePerSec;
-
-    document.getElementById('mined-balance').innerText = currentMined.toFixed(4);
-    document.getElementById('total-balance').innerText = totalBalance.toFixed(4);
-  }
-
-  function claimMinedTokens() {
-    if (currentMined <= 0.0001) {
-      alert("Mining is just starting! Please wait a moment to accumulate NEX.");
-      return;
-    }
-    totalBalance += currentMined;
-    miningStart = Date.now();
-    localStorage.setItem('nex_bal', totalBalance);
-    localStorage.setItem('nex_start', miningStart);
-    alert(`Claimed +${currentMined.toFixed(4)} $NEX successfully!`);
-    updateMining();
   }
 
   setInterval(updateMining, 1000);
@@ -718,7 +744,7 @@
   }
 
   // Direct Referral Link
-  const refLink = `https://t.me/NEXORA_Crypto_Mining_Bot?start=ref_${telegramUserId}`;
+  const refLink = `https://t.me/${BOT_USERNAME}?start=ref_${telegramUserId}`;
   document.getElementById('ref-link-display').value = refLink;
   function shareRefTelegram() {
     window.open(`https://t.me/share/url?url=${encodeURIComponent(refLink)}&text=${encodeURIComponent("⚡ Mine NEXORA ($NEX) on TON! Launching Jan 1, 2027:")}`);
