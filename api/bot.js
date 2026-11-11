@@ -19,8 +19,8 @@ module.exports = async (req, res) => {
       const parts = text.split(' ');
       const startParam = parts.length > 1 ? parts[1] : '';
       const webAppUrl = startParam 
-        ? `https://pp-seven.vercel.app?ref=${encodeURIComponent(startParam)}`
-        : `https://pp-seven.vercel.app`;
+        ? `https://nexora-mining-app-seven.vercel.app?ref=${encodeURIComponent(startParam)}`
+        : `https://nexora-mining-app-seven.vercel.app`;
 
       const welcomeMsg = `⚡ *Welcome to NEXORA Network ($NEX)!*\n\n` +
         `🔶 *Mine NEX automatically 24/7*\n` +
