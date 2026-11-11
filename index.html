@@ -384,7 +384,7 @@
   }
 
   // Server-Synced Referral System
-  const BOT_USERNAME = "NEXORA_Crypto_Mining_Bot"; // သင့် Bot ၏ @username အမှန်ထည့်ပါ
+  const BOT_USERNAME = "NEXORA_Crypto_Mining_Bot";
   const urlParams = new URLSearchParams(window.location.search);
   const refFromUrl = urlParams.get('ref');
   const refFromTg = tg.initDataUnsafe ? tg.initDataUnsafe.start_param : null;
@@ -743,8 +743,8 @@
     el.classList.add('active');
   }
 
-  // Direct Referral Link
-  const refLink = `https://t.me/${BOT_USERNAME}?start=ref_${telegramUserId}`;
+  // Direct Referral Link (BotFather Short Name 'app' ဖြင့်)
+  const refLink = `https://t.me/NEXORA_Crypto_Mining_Bot/app?startapp=ref_${telegramUserId}`;
   document.getElementById('ref-link-display').value = refLink;
   function shareRefTelegram() {
     window.open(`https://t.me/share/url?url=${encodeURIComponent(refLink)}&text=${encodeURIComponent("⚡ Mine NEXORA ($NEX) on TON! Launching Jan 1, 2027:")}`);
