@@ -13,7 +13,7 @@ export default async function handler(req, res) {
   const BOT_TOKEN = "9044078069:AAHARiuHEtFtY0uP8wn-X8VrLnCcR6d0vFM";
 
   if (text.startsWith('/start')) {
-    const startParam = text.split(' ')[1] || ''; // ref parameter
+    const startParam = text.split(' ')[1] || '';
     const webAppUrl = `https://pp-seven.vercel.app?ref=${startParam}`;
 
     const welcomeMsg = `⚡ *Welcome to NEXORA Network ($NEX)!*\n\n` +
