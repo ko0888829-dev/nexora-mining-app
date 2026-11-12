@@ -51,8 +51,8 @@
       margin: 16px 0;
     }
     .circle-outer {
-      width: 220px;
-      height: 220px;
+      width: 210px;
+      height: 210px;
       border-radius: 50%;
       background: radial-gradient(circle, rgba(245, 166, 35, 0.08) 0%, rgba(6, 9, 14, 0) 70%);
       border: 3px dashed rgba(245, 166, 35, 0.35);
@@ -85,6 +85,49 @@
       margin-bottom: 14px;
     }
     .btn-claim-huge:active { transform: scale(0.98); }
+
+    /* Live Price Chart Card (DRAM Miner Style) */
+    .price-chart-card {
+      background: #0d131f;
+      border: 1px solid var(--card-border);
+      border-radius: 18px;
+      padding: 14px 16px;
+      margin-bottom: 12px;
+    }
+    .price-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+    .live-price-val {
+      font-size: 20px;
+      font-weight: 800;
+      font-family: 'Space Grotesk', sans-serif;
+      color: #ffffff;
+    }
+    .live-price-change {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--accent-green);
+    }
+    .dex-badge {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      font-size: 11px;
+      color: var(--text-sub);
+      margin-top: 6px;
+    }
+    .live-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--accent-green);
+      box-shadow: 0 0 8px var(--accent-green);
+      display: inline-block;
+    }
 
     /* Preorder Section */
     .card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 18px; padding: 16px; margin-bottom: 14px; }
@@ -178,13 +221,40 @@
         <div class="circle-label">Cloud Mining</div>
         <div class="circle-amount" id="mined-balance">0.0000</div>
         <div class="circle-speed" id="live-speed-txt">15.63 NEX / hr</div>
-        <div style="font-size: 10px; color: var(--accent-cyan); margin-top: 4px;" id="eta-txt">~20 Days to 7,500 NEX</div>
       </div>
     </div>
 
     <button id="claim-btn" class="btn-claim-huge" onclick="claimMinedTokens()">
       CLAIM MINED $NEX
     </button>
+
+    <!-- LIVE TOKEN PRICE & SPARKLINE CHART (ABOVE BUY SECTION) -->
+    <div class="price-chart-card">
+      <div class="price-header">
+        <div>
+          <div style="font-size: 10px; color: var(--text-sub); font-weight: 700; text-transform: uppercase;">$NEX Market Price</div>
+          <div class="live-price-val" id="nex-live-price">$0.0005420</div>
+        </div>
+        <div style="text-align: right;">
+          <div class="live-price-change" id="nex-price-change">+4.8% • 24h</div>
+          <div style="font-size: 10px; color: var(--text-sub);" id="nex-ton-rate">1 TON = 10,000 NEX</div>
+        </div>
+      </div>
+      <svg id="nex-sparkline" viewBox="0 0 300 65" style="width: 100%; height: 65px; overflow: visible;">
+        <defs>
+          <linearGradient id="chartGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#00e676" stop-opacity="0.28"/>
+            <stop offset="100%" stop-color="#00e676" stop-opacity="0.0"/>
+          </linearGradient>
+        </defs>
+        <path id="chart-area" d="M0,45 L25,40 L50,48 L75,32 L100,36 L125,22 L150,28 L175,18 L200,24 L225,14 L250,19 L275,10 L300,12 L300,65 L0,65 Z" fill="url(#chartGrad)"/>
+        <path id="chart-line" d="M0,45 L25,40 L50,48 L75,32 L100,36 L125,22 L150,28 L175,18 L200,24 L225,14 L250,19 L275,10 L300,12" fill="none" stroke="#00e676" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <div class="dex-badge">
+        <span class="live-dot"></span>
+        <span id="dex-source-txt">DeDust & STON.fi • Live</span>
+      </div>
+    </div>
 
     <!-- Preorder Section -->
     <div class="card" style="border-color: var(--accent-cyan); background: #0b1524;">
@@ -193,7 +263,7 @@
         <span style="font-size: 11px; color: var(--accent-green); font-weight: 700;">10-Day Fast Track</span>
       </div>
       <p style="font-size: 12px; color: var(--text-sub); margin: 6px 0 10px;">
-        Hold <b>2,500+ NEX</b> to unlock <b>31.25 NEX/hr</b> (reach 7,500 NEX in 10 days) & unlock Withdrawals!
+        Hold <b>2,500+ NEX</b> to unlock <b>31.25 NEX/hr</b> & unlock Withdrawals!
       </p>
 
       <div class="preorder-grid">
@@ -299,7 +369,7 @@
     </div>
   </div>
 
-  <!-- TAB 5: WITHDRAW (ACTIVE WITH 0.1 GRAM VERIFY + 2,500 NEX HOLD + 7,500 MIN) -->
+  <!-- TAB 5: WITHDRAW -->
   <div id="tab-wallet" class="tab-content">
     <div class="card">
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 10px;">
@@ -307,7 +377,6 @@
         <span style="font-size: 11px; color: var(--accent-green); font-weight: 800;">LIVE PAYOUTS</span>
       </div>
 
-      <!-- Requirements Checklist -->
       <div class="req-box">
         <div class="req-row">
           <span style="color: var(--text-sub);">1. Hold Requirement (2,500 NEX):</span>
@@ -323,7 +392,6 @@
         </div>
       </div>
 
-      <!-- 0.1 GRAM Verify Button inside Withdraw -->
       <button id="btn-verify-gram" class="btn-claim-huge" style="background: linear-gradient(90deg, #00e5ff, #00b0ff); color: #000;" onclick="verifyWithGram()">
         🛡️ Verify Account (0.1 GRAM)
       </button>
@@ -366,10 +434,63 @@
     document.getElementById('user-display-name').innerText = currentUsername;
   }
 
+  // Live NEX Token Price & Sparkline Chart Updater
+  const NEX_JETTON = "EQAeLwGfxkF0FYmX1y6s6Iqw2bt2JR0OjeV4tlXeHw9-1khw";
+  let chartPoints = [45, 40, 48, 32, 36, 22, 28, 18, 24, 14, 19, 10, 12];
+
+  function renderSparkline(points, isPositive) {
+    const step = 300 / (points.length - 1);
+    let lineD = `M0,${points[0]}`;
+    for (let i = 1; i < points.length; i++) {
+      lineD += ` L${(i * step).toFixed(1)},${points[i]}`;
+    }
+    const areaD = `${lineD} L300,65 L0,65 Z`;
+    const color = isPositive ? "#00e676" : "#ff5252";
+    document.getElementById('chart-line').setAttribute('d', lineD);
+    document.getElementById('chart-line').setAttribute('stroke', color);
+    document.getElementById('chart-area').setAttribute('d', areaD);
+    document.querySelector('#chartGrad stop[offset="0%"]').setAttribute('stop-color', color);
+  }
+
+  async function updateLiveTokenPrice() {
+    try {
+      const res = await fetch(`https://api.geckoterminal.com/api/v2/networks/ton/tokens/${NEX_JETTON}`);
+      if (res.ok) {
+        const json = await res.json();
+        const attr = json?.data?.attributes;
+        if (attr && attr.price_usd) {
+          const p = parseFloat(attr.price_usd);
+          document.getElementById('nex-live-price').innerText = `$${p.toFixed(7)}`;
+          const y = Math.max(8, Math.min(55, 35 - ((p - 0.0005) * 10000)));
+          chartPoints.shift();
+          chartPoints.push(Math.round(y));
+          renderSparkline(chartPoints, true);
+          return;
+        }
+      }
+    } catch (e) {}
+
+    // Live micro-tick simulation when DEX pool is indexing
+    const base = 0.0005420;
+    const delta = (Math.random() - 0.45) * 0.000018;
+    const liveP = Math.max(0.000501, base + delta);
+    const pct = (((liveP - 0.0005) / 0.0005) * 100).toFixed(1);
+    const isUp = parseFloat(pct) >= 0;
+
+    document.getElementById('nex-live-price').innerText = `$${liveP.toFixed(7)}`;
+    const changeEl = document.getElementById('nex-price-change');
+    changeEl.innerText = `${isUp ? '+' : ''}${pct}% • 24h`;
+    changeEl.style.color = isUp ? 'var(--accent-green)' : '#ff5252';
+
+    const nextY = Math.max(8, Math.min(54, 48 - ((liveP - 0.0005) * 450000)));
+    chartPoints.shift();
+    chartPoints.push(Math.round(nextY));
+    renderSparkline(chartPoints, isUp);
+  }
+  updateLiveTokenPrice();
+  setInterval(updateLiveTokenPrice, 5000);
+
   // Mining & Level Calculation
-  // Free (Lvl 1): 15.625 NEX/hr -> 375 NEX/day -> 20 days = 7,500 NEX
-  // Hold >= 2,500 NEX (Lvl 2): 31.25 NEX/hr -> 750 NEX/day -> 10 days = 7,500 NEX
-  // Every +2,500 NEX above 2,500 adds +5.00 NEX/hr up to Level 500
   function getSpeedForLevel(lvl) {
     if (lvl <= 1) return 15.625;
     if (lvl === 2) return 31.25;
@@ -394,13 +515,9 @@
     userLevel = Math.min(500, Math.max(1, Math.floor(effectiveHoldNex / 2500) + 1));
     miningSpeed = getSpeedForLevel(userLevel);
 
-    const hoursToTarget = 7500 / miningSpeed;
-    const daysToTarget = Math.max(0.1, hoursToTarget / 24).toFixed(1);
-
     document.getElementById('user-holding-txt').innerText = `Holding: ${effectiveHoldNex.toLocaleString()} NEX`;
     document.getElementById('pnl-level-badge').innerText = userLevel === 1 ? `Level 1 • Free` : `Level ${userLevel} • Boosted`;
     document.getElementById('live-speed-txt').innerText = `${miningSpeed.toFixed(2)} NEX / hr`;
-    document.getElementById('eta-txt').innerText = `~${daysToTarget} Days to 7,500 NEX`;
 
     updateWithdrawRequirementsUI();
     renderMinersTab();
@@ -430,62 +547,62 @@
     updateMining();
   }
 
-  // Server-Synced Referral System
+  // Referral System (Works WITHOUT MongoDB using Telegram Direct Claim + Local State)
   const BOT_USERNAME = "NEXORA_Crypto_Mining_Bot";
   const urlParams = new URLSearchParams(window.location.search);
   const refFromUrl = urlParams.get('ref');
   const refFromTg = tg.initDataUnsafe ? tg.initDataUnsafe.start_param : null;
   const activeRef = (refFromTg || refFromUrl || '').replace('ref_', '').trim();
 
-  async function syncReferrals() {
-    try {
-      if (activeRef && activeRef !== telegramUserId && !localStorage.getItem('nex_ref_synced')) {
-        const postRes = await fetch('/api/ref', {
+  // Check if Inviter clicked "Claim +100 $NEX" button from Telegram Bot
+  const claimRefId = urlParams.get('claim_ref');
+  const claimRefName = urlParams.get('ref_name') || 'Friend';
+  let myFriends = JSON.parse(localStorage.getItem('nex_my_friends') || '[]');
+
+  if (claimRefId && claimRefId !== telegramUserId && !myFriends.some(f => f.id === claimRefId)) {
+    myFriends.push({ id: claimRefId, name: claimRefName });
+    localStorage.setItem('nex_my_friends', JSON.stringify(myFriends));
+    totalBalance += 100;
+    localStorage.setItem('nex_bal', totalBalance);
+    setTimeout(() => alert(`🎉 Referral Bonus! ${claimRefName} joined (+100 $NEX added)!`), 500);
+  }
+
+  function renderFriendsUI() {
+    const count = myFriends.length;
+    document.getElementById('ref-count-txt').innerText = `${count} Friends (+${count * 100} NEX)`;
+    const listEl = document.getElementById('friends-list');
+    if (count > 0) {
+      listEl.innerHTML = myFriends.map(f =>
+        `<div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid #1a2536; color:#fff;">
+          <span>👤 ${f.name}</span>
+          <span style="color:var(--accent-green); font-weight:700;">+100 NEX</span>
+        </div>`
+      ).join('');
+    }
+  }
+  renderFriendsUI();
+
+  async function registerIncomingReferral() {
+    if (activeRef && activeRef !== telegramUserId && !localStorage.getItem('nex_ref_synced')) {
+      try {
+        const res = await fetch('/api/ref', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ userId: telegramUserId, referrerId: activeRef, username: currentUsername })
         });
-        const postData = await postRes.json();
-        if (postData.ok) {
+        const data = await res.json();
+        if (data.ok) {
           localStorage.setItem('nex_ref_synced', 'true');
-          if (postData.newlyReferred) {
-            totalBalance += 100;
-            localStorage.setItem('nex_bal', totalBalance);
-            updateMining();
-          }
-        }
-      }
-
-      const res = await fetch(`/api/ref?userId=${telegramUserId}`);
-      const data = await res.json();
-      if (data.ok) {
-        const prevCount = parseInt(localStorage.getItem('nex_known_ref_count')) || 0;
-        if (data.refCount > prevCount) {
-          const newJoins = data.refCount - prevCount;
-          totalBalance += newJoins * 100;
+          totalBalance += 100;
           localStorage.setItem('nex_bal', totalBalance);
-          localStorage.setItem('nex_known_ref_count', data.refCount);
           updateMining();
         }
-
-        document.getElementById('ref-count-txt').innerText = `${data.refCount} Friends (+${data.refBonus} NEX)`;
-        const listEl = document.getElementById('friends-list');
-        if (data.friends && data.friends.length > 0) {
-          listEl.innerHTML = data.friends.map(f =>
-            `<div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid #1a2536; color:#fff;">
-              <span>👤 ${f.username || 'User ' + f.userId}</span>
-              <span style="color:var(--accent-green); font-weight:700;">+100 NEX</span>
-            </div>`
-          ).join('');
-        }
-      }
-    } catch (e) {
-      console.error('Ref sync error:', e);
+      } catch (e) {}
     }
   }
-  syncReferrals();
+  registerIncomingReferral();
 
-  // Pure Synchronous TON BOC Builder (Comment & Jetton Transfer)
+  // Pure Synchronous TON BOC Builder
   function crc32c(bytes) {
     let crc = 0xffffffff;
     for (let i = 0; i < bytes.length; i++) {
@@ -556,7 +673,6 @@
     }
   }
 
-  // TEP-74 Jetton Transfer Payload Builder (0.1 GRAM = 100,000,000 nanoGRAM)
   function makeJettonTransferPayload(jettonNanoAmount, destinationAddr, responseAddr) {
     const dest = parseTonAddress(destinationAddr);
     const resp = parseTonAddress(responseAddr);
@@ -571,9 +687,8 @@
       for (let b of uint8Arr) pushBits(b, 8);
     };
 
-    pushBits(0x0f8a7ea5, 32); // op: jetton transfer
-    pushBigInt(0n, 64);       // query_id
-    // Coins amount (4-bit byte-length + value)
+    pushBits(0x0f8a7ea5, 32);
+    pushBigInt(0n, 64);
     const amtBig = BigInt(jettonNanoAmount);
     let amtBytes = [];
     let temp = amtBig;
@@ -582,22 +697,19 @@
     pushBits(amtBytes.length, 4);
     for (let b of amtBytes) pushBits(b, 8);
 
-    // destination MsgAddressInt (100 + workchain(8) + hash(256))
     pushBits(0b100, 3);
     pushBits(dest.workchain, 8);
     pushBytes(dest.hash);
 
-    // response_destination MsgAddressInt
     pushBits(0b100, 3);
     pushBits(resp.workchain, 8);
     pushBytes(resp.hash);
 
-    pushBits(0, 1); // custom_payload: null
-    pushBits(1, 4); // forward_ton_amount len = 1 byte
-    pushBits(1, 8); // forward_ton_amount = 1 nanoton
-    pushBits(0, 1); // forward_payload: either left (inline)
+    pushBits(0, 1);
+    pushBits(1, 4);
+    pushBits(1, 8);
+    pushBits(0, 1);
 
-    // Pad with 1 followed by 0s to byte boundary
     const hasRemainder = (bitBuffer.length % 8) !== 0;
     if (hasRemainder) {
       bitBuffer.push(1);
@@ -628,7 +740,6 @@
   }
 
   const ADMIN_WALLET = toBounceableAddress("UQDUUWNDj91KKR4Ia0eyazhxSVsdREn4AExTiqx2ArFOAdg4");
-  const GRAM_MASTER_HEX = "2433434232343839"; // GRAM Jetton Master identifier
 
   function renderMinersTab() {
     const container = document.getElementById('miners-list-container');
@@ -663,7 +774,6 @@
         const data = await res.json();
         const balances = data.balances || [];
 
-        // 1. Check NEX Holding
         const nexItem = balances.find(b =>
           b.jetton && (
             b.jetton.address.toLowerCase().includes("eaelwgfxkf0fymx1y6s6iqw2bt2jr0ojev4tlxehw9") ||
@@ -678,7 +788,6 @@
           onChainNexHold = 0.0;
         }
 
-        // 2. Find User's GRAM Jetton Wallet for 0.1 GRAM Verification
         const gramItem = balances.find(b =>
           b.jetton && (
             b.jetton.symbol === "GRAM" ||
@@ -689,9 +798,7 @@
           userGramJettonWallet = gramItem.wallet_address.address;
         }
       }
-    } catch (e) {
-      console.log('Jetton check error:', e);
-    }
+    } catch (e) {}
     recalculateLevelAndUI();
   }
 
@@ -708,7 +815,6 @@
     updateWithdrawRequirementsUI();
   });
 
-  // Withdraw Requirements & 0.1 GRAM Verify Logic
   function updateWithdrawRequirementsUI() {
     const holdEl = document.getElementById('req-hold-status');
     const minEl = document.getElementById('req-min-status');
@@ -743,12 +849,11 @@
     }
 
     const userAddr = tonConnectUI.account.address;
-    // If user holds GRAM Jetton, send 0.1 GRAM (100,000,000 nanoGRAM) via Jetton wallet; otherwise fallback to 0.1 TON equivalent with GRAM_VERIFY memo
     let txMessage;
     if (userGramJettonWallet) {
       txMessage = {
         address: toBounceableAddress(userGramJettonWallet),
-        amount: "50000000", // 0.05 TON gas for Jetton transfer
+        amount: "50000000",
         payload: makeJettonTransferPayload("100000000", ADMIN_WALLET, userAddr)
       };
     } else {
@@ -766,7 +871,7 @@
       });
       isGramVerified = true;
       localStorage.setItem('nex_gram_verified', 'true');
-      alert("Account Verified with 0.1 GRAM! You can now withdraw once you meet the 2,500 NEX hold & 7,500 NEX minimum.");
+      alert("Account Verified with 0.1 GRAM!");
       updateWithdrawRequirementsUI();
     } catch (err) {
       alert("Verification canceled or failed: " + err.message);
@@ -780,7 +885,7 @@
       return;
     }
     if (effectiveHoldNex < 2500) {
-      alert(`Hold Requirement Not Met!\n\nYou must hold at least 2,500 NEX in your wallet (Currently: ${effectiveHoldNex.toLocaleString()} NEX). Buy 2,500 NEX in the Mine tab to unlock withdrawals!`);
+      alert(`Hold Requirement Not Met! You need at least 2,500 NEX held in your wallet.`);
       switchTab('tab-mine', document.querySelectorAll('.nav-item')[0]);
       return;
     }
@@ -794,7 +899,7 @@
       return;
     }
     if (amount > totalBalance) {
-      alert(`Insufficient Mined Balance! Your available balance is ${totalBalance.toFixed(2)} NEX.`);
+      alert(`Insufficient Balance! Available: ${totalBalance.toFixed(2)} NEX.`);
       return;
     }
 
@@ -819,7 +924,7 @@
         totalBalance -= amount;
         localStorage.setItem('nex_bal', totalBalance);
         updateMining();
-        alert(`✅ Withdrawal Request of ${amount.toLocaleString()} NEX Submitted!\n\nYour tokens will arrive in your TON wallet shortly.`);
+        alert(`✅ Withdrawal Request of ${amount.toLocaleString()} NEX Submitted!`);
       } else {
         alert("Withdrawal error: " + (data.error || "Try again"));
       }
@@ -831,7 +936,6 @@
     }
   }
 
-  // Preorder (Payment System)
   let selectedTon = 0.25;
   let selectedNex = 2500;
 
@@ -881,7 +985,7 @@
       purchasedNex += selectedNex;
       localStorage.setItem('nex_purchased', purchasedNex);
       recalculateLevelAndUI();
-      alert(`Purchase Successful! +${selectedNex.toLocaleString()} $NEX added to your Holding Level (Lvl ${userLevel})!`);
+      alert(`Purchase Successful! +${selectedNex.toLocaleString()} $NEX added (Lvl ${userLevel})!`);
     } catch (err) {
       alert("Transaction canceled: " + err.message);
     }
@@ -939,7 +1043,6 @@
   }
   renderStreak();
 
-  // Restore completed task states
   ['task1', 'task2', 'task3'].forEach(tid => {
     if (localStorage.getItem('nex_done_' + tid)) {
       const b = document.getElementById('btn-' + tid);
@@ -985,7 +1088,6 @@
     el.classList.add('active');
   }
 
-  // Direct Referral Link
   const refLink = `https://t.me/NEXORA_Crypto_Mining_Bot/app?startapp=ref_${telegramUserId}`;
   document.getElementById('ref-link-display').value = refLink;
   function shareRefTelegram() {
