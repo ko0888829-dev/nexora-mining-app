@@ -6,7 +6,6 @@
   <title>NEXORA Network</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
-  <script src="https://unpkg.com/tonweb@0.0.66/dist/tonweb.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Space+Grotesk:wght@700&display=swap" rel="stylesheet">
   <style>
     :root {
@@ -31,27 +30,6 @@
     .user-name { font-size: 14px; font-weight: 800; }
     .user-tag { font-size: 11px; color: var(--text-sub); }
 
-    /* Verify Button */
-    .btn-verify-top {
-      width: 100%;
-      padding: 12px;
-      border-radius: 14px;
-      border: 1px solid var(--accent-gold);
-      background: linear-gradient(90deg, rgba(245, 166, 35, 0.15), rgba(245, 166, 35, 0.05));
-      color: var(--accent-gold);
-      font-size: 13px;
-      font-weight: 800;
-      cursor: pointer;
-      margin-bottom: 14px;
-      display: none;
-    }
-    .btn-verify-top.verified {
-      border-color: var(--accent-green);
-      background: rgba(0, 230, 118, 0.12);
-      color: var(--accent-green);
-      cursor: default;
-    }
-
     /* PNL Header */
     .pnl-card {
       background: linear-gradient(180deg, #121927 0%, #0a0f18 100%);
@@ -73,8 +51,8 @@
       margin: 16px 0;
     }
     .circle-outer {
-      width: 210px;
-      height: 210px;
+      width: 220px;
+      height: 220px;
       border-radius: 50%;
       background: radial-gradient(circle, rgba(245, 166, 35, 0.08) 0%, rgba(6, 9, 14, 0) 70%);
       border: 3px dashed rgba(245, 166, 35, 0.35);
@@ -83,10 +61,12 @@
       align-items: center;
       justify-content: center;
       box-shadow: 0 0 25px rgba(245, 166, 35, 0.15);
+      text-align: center;
+      padding: 12px;
     }
     .circle-label { font-size: 11px; color: var(--text-sub); text-transform: uppercase; letter-spacing: 1px; }
     .circle-amount { font-size: 28px; font-weight: 800; color: #fff; font-family: 'Space Grotesk', sans-serif; margin: 4px 0; }
-    .circle-speed { font-size: 12px; color: var(--accent-gold); font-weight: 700; }
+    .circle-speed { font-size: 13px; color: var(--accent-gold); font-weight: 800; }
 
     /* Buttons */
     .btn-claim-huge {
@@ -94,7 +74,7 @@
       padding: 16px;
       border-radius: 16px;
       border: none;
-      font-size: 16px;
+      font-size: 15px;
       font-weight: 800;
       letter-spacing: 0.5px;
       cursor: pointer;
@@ -102,7 +82,7 @@
       background: linear-gradient(90deg, #f5a623, #ff7a00);
       color: #000;
       box-shadow: 0 6px 20px rgba(245, 166, 35, 0.35);
-      margin-bottom: 16px;
+      margin-bottom: 14px;
     }
     .btn-claim-huge:active { transform: scale(0.98); }
 
@@ -158,6 +138,11 @@
     .streak-day { background: #080d16; border: 1px solid var(--card-border); border-radius: 8px; padding: 6px 2px; text-align: center; font-size: 9px; }
     .streak-day.claimed { border-color: var(--accent-green); color: var(--accent-green); }
     .streak-day.today { border-color: var(--accent-gold); }
+
+    /* Status Pill */
+    .req-box { background: #080d16; border: 1px solid var(--card-border); border-radius: 12px; padding: 12px; margin-bottom: 12px; }
+    .req-row { display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 6px; }
+    .req-row:last-child { margin-bottom: 0; }
   </style>
 </head>
 <body>
@@ -177,19 +162,14 @@
     <div id="ton-connect-btn"></div>
   </div>
 
-  <!-- Wallet Verify Button -->
-  <button id="btn-verify-wallet" class="btn-verify-top" onclick="triggerWalletVerification()">
-    ⚡ Verify Wallet (0.05 TON)
-  </button>
-
-  <!-- TAB 1: MINE & PREORDER (MAIN) -->
+  <!-- TAB 1: MINE & PREORDER -->
   <div id="tab-mine" class="tab-content active">
     <div class="pnl-card">
       <div class="pnl-top">
         <span style="font-size: 12px; font-weight: 800; color: #fff;">NEXORA MINER • 24H</span>
-        <span class="pnl-badge" id="pnl-level-badge">Level 1 • Active</span>
+        <span class="pnl-badge" id="pnl-level-badge">Level 1 • Free</span>
       </div>
-      <div style="font-size: 11px; color: var(--text-sub); margin-bottom: 4px;">Total Balance</div>
+      <div style="font-size: 11px; color: var(--text-sub); margin-bottom: 4px;">Total Mined Balance</div>
       <div class="balance-display">+<span id="total-balance">0.0000</span> <span style="font-size: 18px; color: #fff;">NEX</span></div>
     </div>
 
@@ -197,8 +177,8 @@
       <div class="circle-outer">
         <div class="circle-label">Cloud Mining</div>
         <div class="circle-amount" id="mined-balance">0.0000</div>
-        <div class="circle-speed" id="live-speed-txt">8.50 NEX / hr</div>
-        <div style="font-size: 10px; color: var(--text-sub); margin-top: 4px;" id="hold-status-txt">Hold NEX to reach Level 500</div>
+        <div class="circle-speed" id="live-speed-txt">15.63 NEX / hr</div>
+        <div style="font-size: 10px; color: var(--accent-cyan); margin-top: 4px;" id="eta-txt">~20 Days to 7,500 NEX</div>
       </div>
     </div>
 
@@ -206,58 +186,58 @@
       CLAIM MINED $NEX
     </button>
 
-    <!-- Preorder (Token Sale) Section -->
+    <!-- Preorder Section -->
     <div class="card" style="border-color: var(--accent-cyan); background: #0b1524;">
       <div style="display:flex; justify-content:space-between; align-items:center;">
-        <span style="font-size: 14px; font-weight: 800; color: #fff;">⚡ Pre-Order $NEX Token</span>
-        <span style="font-size: 11px; color: var(--accent-cyan); font-weight: 700;">Stage 1 Pre-Sale</span>
+        <span style="font-size: 14px; font-weight: 800; color: #fff;">⚡ Buy $NEX (2x Mining Boost)</span>
+        <span style="font-size: 11px; color: var(--accent-green); font-weight: 700;">10-Day Fast Track</span>
       </div>
       <p style="font-size: 12px; color: var(--text-sub); margin: 6px 0 10px;">
-        Exchange TON/GRAM to secure allocations before January 1, 2027 listing.
+        Hold <b>2,500+ NEX</b> to unlock <b>31.25 NEX/hr</b> (reach 7,500 NEX in 10 days) & unlock Withdrawals!
       </p>
 
       <div class="preorder-grid">
-        <div class="preorder-item selected" onclick="selectTier(0.1, 1000, this)">
-          <div class="preorder-ton">0.1 TON</div>
-          <div class="preorder-nex">1,000 NEX</div>
-          <div class="preorder-bonus">Standard Rate</div>
+        <div class="preorder-item selected" onclick="selectTier(0.25, 2500, this)">
+          <div class="preorder-ton">0.25 TON</div>
+          <div class="preorder-nex">2,500 NEX</div>
+          <div class="preorder-bonus">Unlocks Lvl 2 (10 Days)</div>
         </div>
         <div class="preorder-item" onclick="selectTier(0.5, 5500, this)">
           <div class="preorder-ton">0.5 TON</div>
           <div class="preorder-nex">5,500 NEX</div>
-          <div class="preorder-bonus">+10% Bonus</div>
+          <div class="preorder-bonus">Unlocks Lvl 3 (+10%)</div>
         </div>
         <div class="preorder-item" onclick="selectTier(1.0, 12000, this)">
           <div class="preorder-ton">1.0 TON</div>
           <div class="preorder-nex">12,000 NEX</div>
-          <div class="preorder-bonus">+20% Bonus</div>
+          <div class="preorder-bonus">Unlocks Lvl 5 (+20%)</div>
         </div>
-        <div class="preorder-item" onclick="selectTier(10.0, 150000, this)">
-          <div class="preorder-ton">10.0 TON</div>
-          <div class="preorder-nex">150,000 NEX</div>
-          <div class="preorder-bonus">+50% Whale Bonus</div>
+        <div class="preorder-item" onclick="selectTier(5.0, 75000, this)">
+          <div class="preorder-ton">5.0 TON</div>
+          <div class="preorder-nex">75,000 NEX</div>
+          <div class="preorder-bonus">VIP Lvl 31 (+50%)</div>
         </div>
       </div>
 
       <div class="form-group">
-        <label class="form-label">Or Custom TON Amount:</label>
-        <input type="number" id="custom-ton-input" class="form-input" placeholder="e.g. 2.5" oninput="calculateCustomNEX(this.value)">
+        <label class="form-label">Or Custom TON Amount (1 TON = 10,000 NEX):</label>
+        <input type="number" id="custom-ton-input" class="form-input" placeholder="e.g. 0.25" oninput="calculateCustomNEX(this.value)">
       </div>
 
       <button class="btn-claim-huge" style="margin-bottom:0; background: linear-gradient(90deg, #00e5ff, #0072ff); color: #fff;" onclick="executePreorder()">
-        🚀 Buy <span id="preorder-nex-amount">1,000</span> $NEX (<span id="preorder-ton-amount">0.1</span> TON)
+        🚀 Buy <span id="preorder-nex-amount">2,500</span> $NEX (<span id="preorder-ton-amount">0.25</span> TON)
       </button>
     </div>
   </div>
 
-  <!-- TAB 2: MINERS -->
+  <!-- TAB 2: MINERS (LEVELS 1 - 500) -->
   <div id="tab-miners" class="tab-content">
     <div style="display: flex; justify-content: space-between; align-items: baseline;">
-      <div style="font-size: 15px; font-weight: 800;">Node Rigs & Levels</div>
+      <div style="font-size: 15px; font-weight: 800;">Mining Levels (1 - 500)</div>
       <div style="font-size: 12px; color: var(--accent-gold); font-weight: 800;" id="user-holding-txt">Holding: 0 NEX</div>
     </div>
     <div style="font-size: 12px; color: var(--text-sub); margin-bottom: 12px;">
-      Showing your active level and upcoming progression up to <b>Level 500</b>.
+      Lvl 1 (Free): <b>15.63 NEX/h</b> • Lvl 2 (2,500 NEX): <b>31.25 NEX/h</b> (+5 NEX/h per 2,500 NEX).
     </div>
     <div class="miners-grid" id="miners-list-container"></div>
   </div>
@@ -266,7 +246,7 @@
   <div id="tab-tasks" class="tab-content">
     <div class="card">
       <div style="display:flex; justify-content:space-between; align-items:center;">
-        <span style="font-weight: 800; font-size: 13px;">🎁 Daily Streak</span>
+        <span style="font-weight: 800; font-size: 13px;">🎁 Daily Check-in Streak</span>
         <span style="color: var(--accent-gold); font-size: 12px;" id="streak-count-txt">Day 1/7</span>
       </div>
       <div class="streak-grid" id="streak-days"></div>
@@ -274,20 +254,27 @@
     </div>
 
     <div class="card">
-      <div style="font-weight: 800; font-size: 14px; margin-bottom: 10px;">Missions</div>
+      <div style="font-weight: 800; font-size: 14px; margin-bottom: 10px;">Partner & Social Missions</div>
       <div class="task-row">
         <div>
-          <div style="font-size: 13px; font-weight: 700;">Join Official Channel</div>
+          <div style="font-size: 13px; font-weight: 700;">Join NEXORA Official Channel</div>
           <div style="font-size: 11px; color: var(--accent-gold);">+150 $NEX</div>
         </div>
-        <button class="btn-miner" style="width: auto; padding: 6px 14px;" onclick="handleTask('task1', 150, 'https://t.me/A_TOOLSx2', this)">Join</button>
+        <button id="btn-task1" class="btn-miner" style="width: auto; padding: 6px 14px;" onclick="handleTask('task1', 150, 'https://t.me/A_TOOLSx2', this)">Join</button>
       </div>
       <div class="task-row">
         <div>
-          <div style="font-size: 13px; font-weight: 700;">Join Community Chat</div>
+          <div style="font-size: 13px; font-weight: 700;">Check Live $NEX Price in Bot</div>
           <div style="font-size: 11px; color: var(--accent-gold);">+100 $NEX</div>
         </div>
-        <button class="btn-miner" style="width: auto; padding: 6px 14px;" onclick="handleTask('task2', 100, 'https://t.me/A_TOOLSx2', this)">Join</button>
+        <button id="btn-task2" class="btn-miner" style="width: auto; padding: 6px 14px;" onclick="handleTask('task2', 100, 'https://t.me/NEXORA_Crypto_Mining_Bot', this)">Check</button>
+      </div>
+      <div class="task-row">
+        <div>
+          <div style="font-size: 13px; font-weight: 700;">Share NEXORA with 1 Friend</div>
+          <div style="font-size: 11px; color: var(--accent-gold);">+200 $NEX</div>
+        </div>
+        <button id="btn-task3" class="btn-miner" style="width: auto; padding: 6px 14px;" onclick="handleShareTask('task3', 200, this)">Share</button>
       </div>
     </div>
   </div>
@@ -296,7 +283,7 @@
   <div id="tab-friends" class="tab-content">
     <div class="card">
       <div style="font-size: 15px; font-weight: 800; margin-bottom: 6px;">Invite Friends</div>
-      <p style="font-size: 12px; color: var(--text-sub); margin-bottom: 12px;">Get 10% of their mining yields and +100 NEX instantly per friend.</p>
+      <p style="font-size: 12px; color: var(--text-sub); margin-bottom: 12px;">Get +100 NEX instantly for every friend who joins via your link.</p>
       <input type="text" id="ref-link-display" class="form-input" readonly value="Generating..." style="margin-bottom: 12px;">
       <button class="btn-claim-huge" onclick="shareRefTelegram()">🚀 Invite Frens</button>
     </div>
@@ -312,20 +299,46 @@
     </div>
   </div>
 
-  <!-- TAB 5: WITHDRAW -->
+  <!-- TAB 5: WITHDRAW (ACTIVE WITH 0.1 GRAM VERIFY + 2,500 NEX HOLD + 7,500 MIN) -->
   <div id="tab-wallet" class="tab-content">
     <div class="card">
-      <div style="font-size: 15px; font-weight: 800; margin-bottom: 12px;">Withdraw NEX</div>
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 10px;">
+        <span style="font-size: 16px; font-weight: 800;">💸 Withdraw $NEX</span>
+        <span style="font-size: 11px; color: var(--accent-green); font-weight: 800;">LIVE PAYOUTS</span>
+      </div>
+
+      <!-- Requirements Checklist -->
+      <div class="req-box">
+        <div class="req-row">
+          <span style="color: var(--text-sub);">1. Hold Requirement (2,500 NEX):</span>
+          <span id="req-hold-status" style="color: #ff5252; font-weight: 800;">0 / 2,500 NEX ❌</span>
+        </div>
+        <div class="req-row">
+          <span style="color: var(--text-sub);">2. Min Withdraw (7,500 NEX):</span>
+          <span id="req-min-status" style="color: #ff5252; font-weight: 800;">0 / 7,500 NEX ❌</span>
+        </div>
+        <div class="req-row">
+          <span style="color: var(--text-sub);">3. Account Verify (0.1 GRAM):</span>
+          <span id="req-gram-status" style="color: var(--accent-gold); font-weight: 800;">Unverified ⚠️</span>
+        </div>
+      </div>
+
+      <!-- 0.1 GRAM Verify Button inside Withdraw -->
+      <button id="btn-verify-gram" class="btn-claim-huge" style="background: linear-gradient(90deg, #00e5ff, #00b0ff); color: #000;" onclick="verifyWithGram()">
+        🛡️ Verify Account (0.1 GRAM)
+      </button>
+
       <div class="form-group">
-        <label class="form-label">Connected TON Address</label>
-        <input type="text" id="withdraw-addr" class="form-input" readonly placeholder="Connect wallet first">
+        <label class="form-label">Connected TON Wallet Address</label>
+        <input type="text" id="withdraw-addr" class="form-input" readonly placeholder="Connect TON wallet at top right">
       </div>
       <div class="form-group">
-        <label class="form-label">Amount</label>
-        <input type="number" class="form-input" value="500">
+        <label class="form-label">Withdraw Amount (Minimum 7,500 NEX)</label>
+        <input type="number" id="withdraw-amount-input" class="form-input" value="7500" min="7500">
       </div>
-      <button class="btn-claim-huge" style="background:#172439; color:var(--text-sub); cursor:not-allowed;" onclick="alert('Withdrawals open on January 1, 2027!')">
-        🔒 Available on January 1, 2027
+
+      <button id="btn-submit-withdraw" class="btn-claim-huge" style="margin-bottom:0;" onclick="submitWithdrawal()">
+        🚀 Withdraw $NEX Now
       </button>
     </div>
   </div>
@@ -334,10 +347,10 @@
 <!-- Nav Bar -->
 <div class="nav-bar">
   <div class="nav-item active" onclick="switchTab('tab-mine', this)"><div class="nav-icon">⚡</div><div>Mine</div></div>
-  <div class="nav-item" onclick="switchTab('tab-miners', this)"><div class="nav-icon">📦</div><div>Miners</div></div>
+  <div class="nav-item" onclick="switchTab('tab-miners', this)"><div class="nav-icon">📦</div><div>Levels</div></div>
   <div class="nav-item" onclick="switchTab('tab-tasks', this)"><div class="nav-icon">🎯</div><div>Tasks</div></div>
   <div class="nav-item" onclick="switchTab('tab-friends', this)"><div class="nav-icon">👥</div><div>Friends</div></div>
-  <div class="nav-item" onclick="switchTab('tab-wallet', this)"><div class="nav-icon">💼</div><div>Withdraw</div></div>
+  <div class="nav-item" onclick="switchTab('tab-wallet', this)"><div class="nav-icon">💸</div><div>Withdraw</div></div>
 </div>
 
 <script>
@@ -346,19 +359,52 @@
   tg.expand();
 
   let telegramUserId = "5330848428";
+  let currentUsername = "Miner";
   if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
     telegramUserId = String(tg.initDataUnsafe.user.id);
-    document.getElementById('user-display-name').innerText = '@' + (tg.initDataUnsafe.user.username || tg.initDataUnsafe.user.first_name);
+    currentUsername = tg.initDataUnsafe.user.username ? '@' + tg.initDataUnsafe.user.username : tg.initDataUnsafe.user.first_name;
+    document.getElementById('user-display-name').innerText = currentUsername;
   }
 
-  // Mining State
+  // Mining & Level Calculation
+  // Free (Lvl 1): 15.625 NEX/hr -> 375 NEX/day -> 20 days = 7,500 NEX
+  // Hold >= 2,500 NEX (Lvl 2): 31.25 NEX/hr -> 750 NEX/day -> 10 days = 7,500 NEX
+  // Every +2,500 NEX above 2,500 adds +5.00 NEX/hr up to Level 500
+  function getSpeedForLevel(lvl) {
+    if (lvl <= 1) return 15.625;
+    if (lvl === 2) return 31.25;
+    return 31.25 + (lvl - 2) * 5.0;
+  }
+
   let totalBalance = parseFloat(localStorage.getItem('nex_bal')) || 0.0;
+  let purchasedNex = parseFloat(localStorage.getItem('nex_purchased')) || 0.0;
   let miningStart = parseInt(localStorage.getItem('nex_start')) || Date.now();
   localStorage.setItem('nex_start', miningStart);
+
   let currentMined = 0;
   let userLevel = 1;
-  let nexHoldAmount = 0.0;
-  let miningSpeed = 8.50;
+  let onChainNexHold = 0.0;
+  let effectiveHoldNex = purchasedNex;
+  let miningSpeed = getSpeedForLevel(1);
+  let userGramJettonWallet = null;
+  let isGramVerified = localStorage.getItem('nex_gram_verified') === 'true';
+
+  function recalculateLevelAndUI() {
+    effectiveHoldNex = Math.max(onChainNexHold, purchasedNex);
+    userLevel = Math.min(500, Math.max(1, Math.floor(effectiveHoldNex / 2500) + 1));
+    miningSpeed = getSpeedForLevel(userLevel);
+
+    const hoursToTarget = 7500 / miningSpeed;
+    const daysToTarget = Math.max(0.1, hoursToTarget / 24).toFixed(1);
+
+    document.getElementById('user-holding-txt').innerText = `Holding: ${effectiveHoldNex.toLocaleString()} NEX`;
+    document.getElementById('pnl-level-badge').innerText = userLevel === 1 ? `Level 1 • Free` : `Level ${userLevel} • Boosted`;
+    document.getElementById('live-speed-txt').innerText = `${miningSpeed.toFixed(2)} NEX / hr`;
+    document.getElementById('eta-txt').innerText = `~${daysToTarget} Days to 7,500 NEX`;
+
+    updateWithdrawRequirementsUI();
+    renderMinersTab();
+  }
 
   function updateMining() {
     const ratePerSec = miningSpeed / 3600;
@@ -368,18 +414,19 @@
 
     document.getElementById('mined-balance').innerText = currentMined.toFixed(4);
     document.getElementById('total-balance').innerText = totalBalance.toFixed(4);
+    updateWithdrawRequirementsUI();
   }
 
   function claimMinedTokens() {
     if (currentMined <= 0.0001) {
-      alert("Mining is just starting! Please wait a moment to accumulate NEX.");
+      alert("Mining just started! Wait a few seconds to accumulate NEX.");
       return;
     }
     totalBalance += currentMined;
     miningStart = Date.now();
     localStorage.setItem('nex_bal', totalBalance);
     localStorage.setItem('nex_start', miningStart);
-    alert(`Claimed +${currentMined.toFixed(4)} $NEX successfully!`);
+    alert(`Claimed +${currentMined.toFixed(4)} $NEX!`);
     updateMining();
   }
 
@@ -389,9 +436,6 @@
   const refFromUrl = urlParams.get('ref');
   const refFromTg = tg.initDataUnsafe ? tg.initDataUnsafe.start_param : null;
   const activeRef = (refFromTg || refFromUrl || '').replace('ref_', '').trim();
-  const currentUsername = tg.initDataUnsafe?.user?.username
-    ? '@' + tg.initDataUnsafe.user.username
-    : (tg.initDataUnsafe?.user?.first_name || 'Miner');
 
   async function syncReferrals() {
     try {
@@ -441,24 +485,49 @@
   }
   syncReferrals();
 
-  // Official TonWeb Standard Text Comment Cell
-  function makeCommentPayload(text) {
-    try {
-      const tonweb = new window.TonWeb();
-      const cell = new tonweb.boc.Cell();
-      cell.bits.writeUint(0, 32);
-      cell.bits.writeString(text);
-      return TonWeb.utils.bytesToBase64(cell.toBoc());
-    } catch (e) {
-      const bytes = new TextEncoder().encode(text);
-      const dataLen = 4 + bytes.length;
-      const full = new Uint8Array(22 + dataLen);
-      full.set([0xb5, 0xee, 0x9c, 0x72, 0x01, 0x01, 0x01, 0x01, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, dataLen, 0x00, 0x00, 0x00, 0x00]);
-      full.set(bytes, 22);
-      let bin = "";
-      for (let i = 0; i < full.length; i++) bin += String.fromCharCode(full[i]);
-      return btoa(bin);
+  // Pure Synchronous TON BOC Builder (Comment & Jetton Transfer)
+  function crc32c(bytes) {
+    let crc = 0xffffffff;
+    for (let i = 0; i < bytes.length; i++) {
+      crc ^= bytes[i];
+      for (let j = 0; j < 8; j++) {
+        crc = (crc & 1) ? ((crc >>> 1) ^ 0x82f63b78) : (crc >>> 1);
+      }
     }
+    return (crc ^ 0xffffffff) >>> 0;
+  }
+
+  function wrapSingleCellBoc(cellDataBytes) {
+    const dataLen = cellDataBytes.length;
+    const body = new Uint8Array(13 + dataLen);
+    body.set([0xb5, 0xee, 0x9c, 0x72, 0x41, 0x01, 0x01, 0x01, 0x00, 2 + dataLen, 0x00, 0x00, dataLen * 2], 0);
+    body.set(cellDataBytes, 13);
+    const checksum = crc32c(body);
+    const fullBoc = new Uint8Array(body.length + 4);
+    fullBoc.set(body, 0);
+    fullBoc[body.length] = checksum & 0xff;
+    fullBoc[body.length + 1] = (checksum >>> 8) & 0xff;
+    fullBoc[body.length + 2] = (checksum >>> 16) & 0xff;
+    fullBoc[body.length + 3] = (checksum >>> 24) & 0xff;
+    let bin = "";
+    for (let i = 0; i < fullBoc.length; i++) bin += String.fromCharCode(fullBoc[i]);
+    return btoa(bin);
+  }
+
+  function makeCommentPayload(text) {
+    const textBytes = new TextEncoder().encode(text);
+    const cellBytes = new Uint8Array(4 + textBytes.length);
+    cellBytes.set(textBytes, 4);
+    return wrapSingleCellBoc(cellBytes);
+  }
+
+  function parseTonAddress(addrStr) {
+    let b64 = addrStr.replace(/-/g, '+').replace(/_/g, '/');
+    while (b64.length % 4) b64 += '=';
+    const binary = atob(b64);
+    const bytes = new Uint8Array(binary.length);
+    for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+    return { workchain: bytes[1], hash: bytes.slice(2, 34) };
   }
 
   function toBounceableAddress(addrStr) {
@@ -487,8 +556,79 @@
     }
   }
 
+  // TEP-74 Jetton Transfer Payload Builder (0.1 GRAM = 100,000,000 nanoGRAM)
+  function makeJettonTransferPayload(jettonNanoAmount, destinationAddr, responseAddr) {
+    const dest = parseTonAddress(destinationAddr);
+    const resp = parseTonAddress(responseAddr);
+    const bitBuffer = [];
+    const pushBits = (val, bits) => {
+      for (let i = bits - 1; i >= 0; i--) bitBuffer.push((val >>> i) & 1);
+    };
+    const pushBigInt = (bigVal, bits) => {
+      for (let i = bits - 1; i >= 0; i--) bitBuffer.push(Number((bigVal >> BigInt(i)) & 1n));
+    };
+    const pushBytes = (uint8Arr) => {
+      for (let b of uint8Arr) pushBits(b, 8);
+    };
+
+    pushBits(0x0f8a7ea5, 32); // op: jetton transfer
+    pushBigInt(0n, 64);       // query_id
+    // Coins amount (4-bit byte-length + value)
+    const amtBig = BigInt(jettonNanoAmount);
+    let amtBytes = [];
+    let temp = amtBig;
+    while (temp > 0n) { amtBytes.unshift(Number(temp & 0xffn)); temp >>= 8n; }
+    if (amtBytes.length === 0) amtBytes = [0];
+    pushBits(amtBytes.length, 4);
+    for (let b of amtBytes) pushBits(b, 8);
+
+    // destination MsgAddressInt (100 + workchain(8) + hash(256))
+    pushBits(0b100, 3);
+    pushBits(dest.workchain, 8);
+    pushBytes(dest.hash);
+
+    // response_destination MsgAddressInt
+    pushBits(0b100, 3);
+    pushBits(resp.workchain, 8);
+    pushBytes(resp.hash);
+
+    pushBits(0, 1); // custom_payload: null
+    pushBits(1, 4); // forward_ton_amount len = 1 byte
+    pushBits(1, 8); // forward_ton_amount = 1 nanoton
+    pushBits(0, 1); // forward_payload: either left (inline)
+
+    // Pad with 1 followed by 0s to byte boundary
+    const hasRemainder = (bitBuffer.length % 8) !== 0;
+    if (hasRemainder) {
+      bitBuffer.push(1);
+      while (bitBuffer.length % 8 !== 0) bitBuffer.push(0);
+    }
+
+    const byteArr = new Uint8Array(bitBuffer.length / 8);
+    for (let i = 0; i < byteArr.length; i++) {
+      let byteVal = 0;
+      for (let b = 0; b < 8; b++) byteVal = (byteVal << 1) | bitBuffer[i * 8 + b];
+      byteArr[i] = byteVal;
+    }
+
+    const d2 = hasRemainder ? ((byteArr.length * 2) - 1) : (byteArr.length * 2);
+    const body = new Uint8Array(13 + byteArr.length);
+    body.set([0xb5, 0xee, 0x9c, 0x72, 0x41, 0x01, 0x01, 0x01, 0x00, 2 + byteArr.length, 0x00, 0x00, d2], 0);
+    body.set(byteArr, 13);
+    const checksum = crc32c(body);
+    const fullBoc = new Uint8Array(body.length + 4);
+    fullBoc.set(body, 0);
+    fullBoc[body.length] = checksum & 0xff;
+    fullBoc[body.length + 1] = (checksum >>> 8) & 0xff;
+    fullBoc[body.length + 2] = (checksum >>> 16) & 0xff;
+    fullBoc[body.length + 3] = (checksum >>> 24) & 0xff;
+    let bin = "";
+    for (let i = 0; i < fullBoc.length; i++) bin += String.fromCharCode(fullBoc[i]);
+    return btoa(bin);
+  }
+
   const ADMIN_WALLET = toBounceableAddress("UQDUUWNDj91KKR4Ia0eyazhxSVsdREn4AExTiqx2ArFOAdg4");
-  let isWalletVerified = localStorage.getItem('nex_wallet_verified') === 'true';
+  const GRAM_MASTER_HEX = "2433434232343839"; // GRAM Jetton Master identifier
 
   function renderMinersTab() {
     const container = document.getElementById('miners-list-container');
@@ -496,32 +636,35 @@
 
     for (let lvl = userLevel; lvl <= 500; lvl++) {
       const isCurrent = lvl === userLevel;
-      const speed = (8.50 + (lvl - 1) * 0.20).toFixed(2);
-      const requiredNex = ((lvl - 1) * 20000).toLocaleString();
+      const speed = getSpeedForLevel(lvl).toFixed(2);
+      const requiredNex = ((lvl - 1) * 2500).toLocaleString();
 
       const card = document.createElement('div');
       card.className = `miner-card ${isCurrent ? 'active' : ''}`;
       card.innerHTML = `
         <div style="font-size: 11px; color: ${isCurrent ? 'var(--accent-green)' : 'var(--text-sub)'}; font-weight: 800;">Lvl ${lvl}</div>
         <div style="font-size: 26px; margin: 4px 0;">${isCurrent ? '⚡' : (lvl % 50 === 0 ? '👑' : '📦')}</div>
-        <div style="font-size: 15px; font-weight: 800; color: ${isCurrent ? 'var(--accent-green)' : 'var(--accent-gold)'};">
-          ${isCurrent ? 'ACTIVE' : `Hold ${requiredNex} NEX`}
+        <div style="font-size: 14px; font-weight: 800; color: ${isCurrent ? 'var(--accent-green)' : 'var(--accent-gold)'};">
+          ${lvl === 1 ? 'FREE PLAN' : (isCurrent ? 'ACTIVE' : `Hold ${requiredNex} NEX`)}
         </div>
         <div style="font-size: 10px; color: var(--text-sub); margin: 3px 0 6px;">Speed ${speed} NEX/h</div>
         <button class="btn-miner ${isCurrent ? 'active' : ''}">
-          ${isCurrent ? 'ACTIVE' : `🔒 NEED LVL ${lvl}`}
+          ${isCurrent ? 'ACTIVE' : `🔒 NEED ${requiredNex} NEX`}
         </button>
       `;
       container.appendChild(card);
     }
   }
 
-  async function checkWalletHolding(rawAddress) {
+  async function checkWalletJettons(rawAddress) {
     try {
       const res = await fetch(`https://tonapi.io/v2/accounts/${rawAddress}/jettons`);
       if (res.ok) {
         const data = await res.json();
-        const nexItem = (data.balances || []).find(b => 
+        const balances = data.balances || [];
+
+        // 1. Check NEX Holding
+        const nexItem = balances.find(b =>
           b.jetton && (
             b.jetton.address.toLowerCase().includes("eaelwgfxkf0fymx1y6s6iqw2bt2jr0ojev4tlxehw9") ||
             b.jetton.symbol === "NEX" ||
@@ -530,23 +673,26 @@
         );
         if (nexItem) {
           const dec = nexItem.jetton.decimals || 9;
-          nexHoldAmount = parseFloat(nexItem.balance) / Math.pow(10, dec);
+          onChainNexHold = parseFloat(nexItem.balance) / Math.pow(10, dec);
         } else {
-          nexHoldAmount = 0.0;
+          onChainNexHold = 0.0;
+        }
+
+        // 2. Find User's GRAM Jetton Wallet for 0.1 GRAM Verification
+        const gramItem = balances.find(b =>
+          b.jetton && (
+            b.jetton.symbol === "GRAM" ||
+            b.jetton.address.toLowerCase().includes("c71749d376c6d39557539e682a4e8159c43050a31a661f1085861a588a41a322")
+          )
+        );
+        if (gramItem && gramItem.wallet_address) {
+          userGramJettonWallet = gramItem.wallet_address.address;
         }
       }
     } catch (e) {
       console.log('Jetton check error:', e);
     }
-
-    userLevel = Math.min(500, Math.max(1, Math.floor(nexHoldAmount / 20000) + 1));
-    miningSpeed = 8.50 + (userLevel - 1) * 0.20;
-
-    document.getElementById('user-holding-txt').innerText = `Holding: ${nexHoldAmount.toLocaleString()} NEX`;
-    document.getElementById('pnl-level-badge').innerText = `Level ${userLevel} • Active`;
-    document.getElementById('live-speed-txt').innerText = `${miningSpeed.toFixed(2)} NEX / hr`;
-    document.getElementById('hold-status-txt').innerText = `Level ${userLevel}/500 (Holding ${nexHoldAmount.toLocaleString()} NEX)`;
-    renderMinersTab();
+    recalculateLevelAndUI();
   }
 
   const tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
@@ -554,68 +700,140 @@
     buttonRootId: 'ton-connect-btn'
   });
 
-  function updateWalletVerifyUI() {
-    const vBtn = document.getElementById('btn-verify-wallet');
-    if (tonConnectUI.connected) {
-      vBtn.style.display = "block";
-      if (isWalletVerified) {
-        vBtn.className = "btn-verify-top verified";
-        vBtn.innerText = "✓ Wallet Verified";
-        vBtn.onclick = null;
-      } else {
-        vBtn.className = "btn-verify-top";
-        vBtn.innerText = "⚡ Verify Wallet (0.05 TON)";
-        vBtn.onclick = triggerWalletVerification;
-      }
-    } else {
-      vBtn.style.display = "none";
-    }
-  }
-
   tonConnectUI.onStatusChange(wallet => {
     if (wallet) {
       document.getElementById('withdraw-addr').value = wallet.account.address;
-      checkWalletHolding(wallet.account.address);
+      checkWalletJettons(wallet.account.address);
     }
-    updateWalletVerifyUI();
+    updateWithdrawRequirementsUI();
   });
 
-  async function triggerWalletVerification() {
+  // Withdraw Requirements & 0.1 GRAM Verify Logic
+  function updateWithdrawRequirementsUI() {
+    const holdEl = document.getElementById('req-hold-status');
+    const minEl = document.getElementById('req-min-status');
+    const gramEl = document.getElementById('req-gram-status');
+    const verifyBtn = document.getElementById('btn-verify-gram');
+
+    const hasEnoughHold = effectiveHoldNex >= 2500;
+    const hasEnoughBal = totalBalance >= 7500;
+
+    holdEl.innerText = `${effectiveHoldNex.toLocaleString()} / 2,500 NEX ${hasEnoughHold ? '✅' : '❌'}`;
+    holdEl.style.color = hasEnoughHold ? 'var(--accent-green)' : '#ff5252';
+
+    minEl.innerText = `${Math.floor(totalBalance).toLocaleString()} / 7,500 NEX ${hasEnoughBal ? '✅' : '❌'}`;
+    minEl.style.color = hasEnoughBal ? 'var(--accent-green)' : '#ff5252';
+
+    if (isGramVerified) {
+      gramEl.innerText = "Verified (0.1 GRAM Paid) ✅";
+      gramEl.style.color = "var(--accent-green)";
+      verifyBtn.style.display = "none";
+    } else {
+      gramEl.innerText = "Unverified ⚠️";
+      gramEl.style.color = "var(--accent-gold)";
+      verifyBtn.style.display = "block";
+    }
+  }
+
+  async function verifyWithGram() {
     if (!tonConnectUI.connected) {
-      alert("Please connect your wallet first!");
+      alert("Please connect your TON wallet first!");
       tonConnectUI.openModal();
       return;
     }
-    if (isWalletVerified) return;
 
-    const memoText = `VERIFY_NEXORA_TG_${telegramUserId}`;
-    const transaction = {
-      validUntil: Math.floor(Date.now() / 1000) + 300,
-      messages: [
-        {
-          address: ADMIN_WALLET,
-          amount: "50000000",
-          payload: makeCommentPayload(memoText)
-        }
-      ]
-    };
+    const userAddr = tonConnectUI.account.address;
+    // If user holds GRAM Jetton, send 0.1 GRAM (100,000,000 nanoGRAM) via Jetton wallet; otherwise fallback to 0.1 TON equivalent with GRAM_VERIFY memo
+    let txMessage;
+    if (userGramJettonWallet) {
+      txMessage = {
+        address: toBounceableAddress(userGramJettonWallet),
+        amount: "50000000", // 0.05 TON gas for Jetton transfer
+        payload: makeJettonTransferPayload("100000000", ADMIN_WALLET, userAddr)
+      };
+    } else {
+      txMessage = {
+        address: ADMIN_WALLET,
+        amount: "100000000",
+        payload: makeCommentPayload(`VERIFY_0.1_GRAM_NEXORA_TG_${telegramUserId}`)
+      };
+    }
 
     try {
-      await tonConnectUI.sendTransaction(transaction);
-      isWalletVerified = true;
-      localStorage.setItem('nex_wallet_verified', 'true');
-      totalBalance += 300;
-      localStorage.setItem('nex_bal', totalBalance);
-      alert("Wallet Successfully Verified! +300 $NEX credited.");
-      updateWalletVerifyUI();
-      updateMining();
+      await tonConnectUI.sendTransaction({
+        validUntil: Math.floor(Date.now() / 1000) + 300,
+        messages: [txMessage]
+      });
+      isGramVerified = true;
+      localStorage.setItem('nex_gram_verified', 'true');
+      alert("Account Verified with 0.1 GRAM! You can now withdraw once you meet the 2,500 NEX hold & 7,500 NEX minimum.");
+      updateWithdrawRequirementsUI();
     } catch (err) {
       alert("Verification canceled or failed: " + err.message);
     }
   }
 
-  let selectedTon = 0.1;
-  let selectedNex = 1000;
+  async function submitWithdrawal() {
+    if (!tonConnectUI.connected) {
+      alert("Please connect your TON wallet first!");
+      tonConnectUI.openModal();
+      return;
+    }
+    if (effectiveHoldNex < 2500) {
+      alert(`Hold Requirement Not Met!\n\nYou must hold at least 2,500 NEX in your wallet (Currently: ${effectiveHoldNex.toLocaleString()} NEX). Buy 2,500 NEX in the Mine tab to unlock withdrawals!`);
+      switchTab('tab-mine', document.querySelectorAll('.nav-item')[0]);
+      return;
+    }
+    if (!isGramVerified) {
+      alert("Please complete the 0.1 GRAM Account Verification first!");
+      return;
+    }
+    const amount = parseFloat(document.getElementById('withdraw-amount-input').value);
+    if (isNaN(amount) || amount < 7500) {
+      alert("Minimum withdrawal amount is 7,500 NEX!");
+      return;
+    }
+    if (amount > totalBalance) {
+      alert(`Insufficient Mined Balance! Your available balance is ${totalBalance.toFixed(2)} NEX.`);
+      return;
+    }
+
+    const btn = document.getElementById('btn-submit-withdraw');
+    btn.disabled = true;
+    btn.innerText = "Processing Withdrawal...";
+
+    try {
+      const res = await fetch('/api/withdraw', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userId: telegramUserId,
+          username: currentUsername,
+          walletAddress: tonConnectUI.account.address,
+          amount,
+          holdAmount: effectiveHoldNex
+        })
+      });
+      const data = await res.json();
+      if (data.ok) {
+        totalBalance -= amount;
+        localStorage.setItem('nex_bal', totalBalance);
+        updateMining();
+        alert(`✅ Withdrawal Request of ${amount.toLocaleString()} NEX Submitted!\n\nYour tokens will arrive in your TON wallet shortly.`);
+      } else {
+        alert("Withdrawal error: " + (data.error || "Try again"));
+      }
+    } catch (e) {
+      alert("Network error submitting withdrawal.");
+    } finally {
+      btn.disabled = false;
+      btn.innerText = "🚀 Withdraw $NEX Now";
+    }
+  }
+
+  // Preorder (Payment System)
+  let selectedTon = 0.25;
+  let selectedNex = 2500;
 
   function selectTier(ton, nex, el) {
     document.querySelectorAll('.preorder-item').forEach(i => i.classList.remove('selected'));
@@ -640,7 +858,7 @@
 
   async function executePreorder() {
     if (!tonConnectUI.connected) {
-      alert("Connect Tonkeeper or TON wallet to preorder!");
+      alert("Connect your TON wallet to buy $NEX!");
       tonConnectUI.openModal();
       return;
     }
@@ -660,20 +878,20 @@
 
     try {
       await tonConnectUI.sendTransaction(transaction);
-      totalBalance += selectedNex;
-      localStorage.setItem('nex_bal', totalBalance);
-      alert(`Preorder Successful! +${selectedNex.toLocaleString()} $NEX added.`);
-      updateMining();
+      purchasedNex += selectedNex;
+      localStorage.setItem('nex_purchased', purchasedNex);
+      recalculateLevelAndUI();
+      alert(`Purchase Successful! +${selectedNex.toLocaleString()} $NEX added to your Holding Level (Lvl ${userLevel})!`);
     } catch (err) {
-      alert("Preorder canceled: " + err.message);
+      alert("Transaction canceled: " + err.message);
     }
   }
 
   setInterval(updateMining, 1000);
+  recalculateLevelAndUI();
   updateMining();
-  renderMinersTab();
 
-  // Streak
+  // Streak & Tasks
   const dailyRewards = [25, 35, 50, 75, 100, 150, 250];
   let streakDay = parseInt(localStorage.getItem('nex_streak_day')) || 1;
   let lastClaimDate = localStorage.getItem('nex_last_streak_date') || "";
@@ -721,11 +939,35 @@
   }
   renderStreak();
 
-  // Tasks
+  // Restore completed task states
+  ['task1', 'task2', 'task3'].forEach(tid => {
+    if (localStorage.getItem('nex_done_' + tid)) {
+      const b = document.getElementById('btn-' + tid);
+      if (b) {
+        b.innerText = "Done ✓";
+        b.className = "btn-miner active";
+      }
+    }
+  });
+
   function handleTask(taskId, reward, link, btn) {
     if (localStorage.getItem('nex_done_' + taskId)) return;
     window.open(link, '_blank');
-    btn.innerText = "...";
+    btn.innerText = "Verifying...";
+    setTimeout(() => {
+      totalBalance += reward;
+      localStorage.setItem('nex_bal', totalBalance);
+      localStorage.setItem('nex_done_' + taskId, 'true');
+      btn.innerText = "Done ✓";
+      btn.className = "btn-miner active";
+      updateMining();
+    }, 2500);
+  }
+
+  function handleShareTask(taskId, reward, btn) {
+    if (localStorage.getItem('nex_done_' + taskId)) return;
+    shareRefTelegram();
+    btn.innerText = "Verifying...";
     setTimeout(() => {
       totalBalance += reward;
       localStorage.setItem('nex_bal', totalBalance);
@@ -743,11 +985,11 @@
     el.classList.add('active');
   }
 
-  // Direct Referral Link (BotFather Short Name 'app' ဖြင့်)
+  // Direct Referral Link
   const refLink = `https://t.me/NEXORA_Crypto_Mining_Bot/app?startapp=ref_${telegramUserId}`;
   document.getElementById('ref-link-display').value = refLink;
   function shareRefTelegram() {
-    window.open(`https://t.me/share/url?url=${encodeURIComponent(refLink)}&text=${encodeURIComponent("⚡ Mine NEXORA ($NEX) on TON! Launching Jan 1, 2027:")}`);
+    window.open(`https://t.me/share/url?url=${encodeURIComponent(refLink)}&text=${encodeURIComponent("⚡ Mine NEXORA ($NEX) on TON! Earn 7,500 NEX & Withdraw:")}`);
   }
 </script>
 </body>
