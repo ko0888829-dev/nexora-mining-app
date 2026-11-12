@@ -86,7 +86,7 @@
     }
     .btn-claim-huge:active { transform: scale(0.98); }
 
-    /* Live Price Chart Card (DRAM Miner Style) */
+    /* Live Price Chart Card */
     .price-chart-card {
       background: #0d131f;
       border: 1px solid var(--card-border);
@@ -228,7 +228,7 @@
       CLAIM MINED $NEX
     </button>
 
-    <!-- LIVE TOKEN PRICE & SPARKLINE CHART (ABOVE BUY SECTION) -->
+    <!-- LIVE TOKEN PRICE & SPARKLINE CHART -->
     <div class="price-chart-card">
       <div class="price-header">
         <div>
@@ -327,17 +327,17 @@
       <div style="font-weight: 800; font-size: 14px; margin-bottom: 10px;">Partner & Social Missions</div>
       <div class="task-row">
         <div>
-          <div style="font-size: 13px; font-weight: 700;">Join NEXORA Official Channel</div>
+          <div style="font-size: 13px; font-weight: 700;">Join Crypto Mining MM</div>
           <div style="font-size: 11px; color: var(--accent-gold);">+150 $NEX</div>
         </div>
-        <button id="btn-task1" class="btn-miner" style="width: auto; padding: 6px 14px;" onclick="handleTask('task1', 150, 'https://t.me/A_TOOLSx2', this)">Join</button>
+        <button id="btn-task1" class="btn-miner" style="width: auto; padding: 6px 14px;" onclick="handleTask('task1', 150, 'https://t.me/cryptominingmm0', this)">Join</button>
       </div>
       <div class="task-row">
         <div>
-          <div style="font-size: 13px; font-weight: 700;">Check Live $NEX Price in Bot</div>
-          <div style="font-size: 11px; color: var(--accent-gold);">+100 $NEX</div>
+          <div style="font-size: 13px; font-weight: 700;">Join NEXORA Official Channel</div>
+          <div style="font-size: 11px; color: var(--accent-gold);">+150 $NEX</div>
         </div>
-        <button id="btn-task2" class="btn-miner" style="width: auto; padding: 6px 14px;" onclick="handleTask('task2', 100, 'https://t.me/NEXORA_Crypto_Mining_Bot', this)">Check</button>
+        <button id="btn-task2" class="btn-miner" style="width: auto; padding: 6px 14px;" onclick="handleTask('task2', 150, 'https://t.me/A_TOOLSx2', this)">Join</button>
       </div>
       <div class="task-row">
         <div>
@@ -470,7 +470,6 @@
       }
     } catch (e) {}
 
-    // Live micro-tick simulation when DEX pool is indexing
     const base = 0.0005420;
     const delta = (Math.random() - 0.45) * 0.000018;
     const liveP = Math.max(0.000501, base + delta);
@@ -547,14 +546,13 @@
     updateMining();
   }
 
-  // Referral System (Works WITHOUT MongoDB using Telegram Direct Claim + Local State)
+  // Referral System
   const BOT_USERNAME = "NEXORA_Crypto_Mining_Bot";
   const urlParams = new URLSearchParams(window.location.search);
   const refFromUrl = urlParams.get('ref');
   const refFromTg = tg.initDataUnsafe ? tg.initDataUnsafe.start_param : null;
   const activeRef = (refFromTg || refFromUrl || '').replace('ref_', '').trim();
 
-  // Check if Inviter clicked "Claim +100 $NEX" button from Telegram Bot
   const claimRefId = urlParams.get('claim_ref');
   const claimRefName = urlParams.get('ref_name') || 'Friend';
   let myFriends = JSON.parse(localStorage.getItem('nex_my_friends') || '[]');
