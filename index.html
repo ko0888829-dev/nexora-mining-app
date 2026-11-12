@@ -325,16 +325,17 @@
 
     <div class="card">
       <div style="font-weight: 800; font-size: 14px; margin-bottom: 10px;">Partner & Social Missions</div>
-      <div class="task-row">
-        <div>
-          <div style="font-size: 13px; font-weight: 700;">Join Crypto Mining MM</div>
-          <div style="font-size: 11px; color: var(--accent-gold);">+150 $NEX</div>
-        </div>
-        <button id="btn-task1" class="btn-miner" style="width: auto; padding: 6px 14px;" onclick="handleTask('task1', 150, 'https://t.me/cryptominingmm0', this)">Join</button>
-      </div>
+      <!-- STRICT VERIFIED CHANNEL TASK -->
       <div class="task-row">
         <div>
           <div style="font-size: 13px; font-weight: 700;">Join NEXORA Official Channel</div>
+          <div style="font-size: 11px; color: var(--accent-gold);">+150 $NEX • Must Join to Claim</div>
+        </div>
+        <button id="btn-task1" class="btn-miner" style="width: auto; padding: 6px 14px;" onclick="handleVerifiedChannelTask('task1', 150, 'https://t.me/nexora_mining', this)">Join</button>
+      </div>
+      <div class="task-row">
+        <div>
+          <div style="font-size: 13px; font-weight: 700;">Join Partner Channel</div>
           <div style="font-size: 11px; color: var(--accent-gold);">+150 $NEX</div>
         </div>
         <button id="btn-task2" class="btn-miner" style="width: auto; padding: 6px 14px;" onclick="handleTask('task2', 150, 'https://t.me/A_TOOLSx2', this)">Join</button>
@@ -1050,6 +1051,62 @@
       }
     }
   });
+
+  // Strict Telegram Channel Membership Check
+  let task1Opened = false;
+  async function handleVerifiedChannelTask(taskId, reward, link, btn) {
+    if (localStorage.getItem('nex_done_' + taskId)) return;
+
+    if (!task1Opened) {
+      if (tg.openTelegramLink) {
+        tg.openTelegramLink(link);
+      } else {
+        window.open(link, '_blank');
+      }
+      task1Opened = true;
+      btn.innerText = "Check";
+      btn.style.background = "var(--accent-green)";
+      btn.style.color = "#000";
+      return;
+    }
+
+    btn.innerText = "Checking...";
+    btn.disabled = true;
+
+    try {
+      const res = await fetch('/api/check_task', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: telegramUserId })
+      });
+      const data = await res.json();
+
+      if (data.ok && data.joined) {
+        totalBalance += reward;
+        localStorage.setItem('nex_bal', totalBalance);
+        localStorage.setItem('nex_done_' + taskId, 'true');
+        btn.innerText = "Done ✓";
+        btn.className = "btn-miner active";
+        btn.style.background = "";
+        btn.style.color = "";
+        updateMining();
+        alert(`🎉 Verified! You joined @nexora_mining (+${reward} $NEX added)!`);
+      } else if (data.error) {
+        alert(data.error);
+        btn.innerText = "Check";
+        btn.disabled = false;
+      } else {
+        alert("❌ You haven't joined @nexora_mining yet! Please join the channel first and tap Check.");
+        if (tg.openTelegramLink) tg.openTelegramLink(link);
+        btn.innerText = "Check";
+        btn.disabled = false;
+      }
+    } catch (e) {
+      alert("Verification error. Please try again.");
+      btn.innerText = "Check";
+      btn.disabled = false;
+    }
+  }
 
   function handleTask(taskId, reward, link, btn) {
     if (localStorage.getItem('nex_done_' + taskId)) return;
