@@ -233,11 +233,11 @@
       <div class="price-header">
         <div>
           <div style="font-size: 10px; color: var(--text-sub); font-weight: 700; text-transform: uppercase;">$NEX Market Price</div>
-          <div class="live-price-val" id="nex-live-price">$0.0000200</div>
+          <div class="live-price-val" id="nex-live-price">$0.0000252</div>
         </div>
         <div style="text-align: right;">
           <div class="live-price-change" id="nex-price-change">+0.00% • 24h</div>
-          <div style="font-size: 10px; color: var(--text-sub);" id="nex-ton-rate">1 TON = 10,000 NEX</div>
+          <div style="font-size: 10px; color: var(--text-sub);" id="nex-ton-rate">1 TON ≈ 55,000 NEX</div>
         </div>
       </div>
       <svg id="nex-sparkline" viewBox="0 0 300 65" style="width: 100%; height: 65px; overflow: visible;">
@@ -247,55 +247,55 @@
             <stop offset="100%" stop-color="#00e676" stop-opacity="0.0"/>
           </linearGradient>
         </defs>
-        <path id="chart-area" d="M0,38 L25,36 L50,40 L75,35 L100,37 L125,33 L150,35 L175,31 L200,34 L225,30 L250,32 L275,29 L300,30 L300,65 L0,65 Z" fill="url(#chartGrad)"/>
-        <path id="chart-line" d="M0,38 L25,36 L50,40 L75,35 L100,37 L125,33 L150,35 L175,31 L200,34 L225,30 L250,32 L275,29 L300,30" fill="none" stroke="#00e676" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        <path id="chart-area" d="M0,42 L25,36 L50,44 L75,30 L100,35 L125,24 L150,29 L175,20 L200,26 L225,16 L250,22 L275,14 L300,18 L300,65 L0,65 Z" fill="url(#chartGrad)"/>
+        <path id="chart-line" d="M0,42 L25,36 L50,44 L75,30 L100,35 L125,24 L150,29 L175,20 L200,26 L225,16 L250,22 L275,14 L300,18" fill="none" stroke="#00e676" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
       </svg>
       <div class="dex-badge">
         <span class="live-dot"></span>
-        <span id="dex-source-txt">DeDust & STON.fi • Live</span>
+        <span id="dex-source-txt">STONFI-V2 • Live Market Rate</span>
       </div>
     </div>
 
-    <!-- Preorder Section -->
+    <!-- Buy $NEX at Live Market Price Section -->
     <div class="card" style="border-color: var(--accent-cyan); background: #0b1524;">
       <div style="display:flex; justify-content:space-between; align-items:center;">
-        <span style="font-size: 14px; font-weight: 800; color: #fff;">⚡ Buy $NEX (2x Mining Boost)</span>
-        <span style="font-size: 11px; color: var(--accent-green); font-weight: 700;">10-Day Fast Track</span>
+        <span style="font-size: 14px; font-weight: 800; color: #fff;">⚡ Buy $NEX (Live DEX Price)</span>
+        <span style="font-size: 11px; color: var(--accent-green); font-weight: 700;">Instant Level Boost</span>
       </div>
       <p style="font-size: 12px; color: var(--text-sub); margin: 6px 0 10px;">
-        Hold <b>2,500+ NEX</b> to unlock <b>31.25 NEX/hr</b> & unlock Withdrawals!
+        Buy at real-time STON.fi market price! Hold <b>2,500+ NEX</b> to unlock <b>31.25+ NEX/hr</b> & Withdrawals.
       </p>
 
       <div class="preorder-grid">
-        <div class="preorder-item selected" onclick="selectTier(0.25, 2500, this)">
+        <div class="preorder-item selected" id="tier-card-0" onclick="selectTierByIndex(0, this)">
+          <div class="preorder-ton">0.1 TON</div>
+          <div class="preorder-nex" id="tier-nex-0">5,500 NEX</div>
+          <div class="preorder-bonus" id="tier-lvl-0">Unlocks Lvl 3</div>
+        </div>
+        <div class="preorder-item" id="tier-card-1" onclick="selectTierByIndex(1, this)">
           <div class="preorder-ton">0.25 TON</div>
-          <div class="preorder-nex">2,500 NEX</div>
-          <div class="preorder-bonus">Unlocks Lvl 2 (10 Days)</div>
+          <div class="preorder-nex" id="tier-nex-1">13,750 NEX</div>
+          <div class="preorder-bonus" id="tier-lvl-1">Unlocks Lvl 6</div>
         </div>
-        <div class="preorder-item" onclick="selectTier(0.5, 5500, this)">
+        <div class="preorder-item" id="tier-card-2" onclick="selectTierByIndex(2, this)">
           <div class="preorder-ton">0.5 TON</div>
-          <div class="preorder-nex">5,500 NEX</div>
-          <div class="preorder-bonus">Unlocks Lvl 3 (+10%)</div>
+          <div class="preorder-nex" id="tier-nex-2">27,500 NEX</div>
+          <div class="preorder-bonus" id="tier-lvl-2">Unlocks Lvl 12</div>
         </div>
-        <div class="preorder-item" onclick="selectTier(1.0, 12000, this)">
+        <div class="preorder-item" id="tier-card-3" onclick="selectTierByIndex(3, this)">
           <div class="preorder-ton">1.0 TON</div>
-          <div class="preorder-nex">12,000 NEX</div>
-          <div class="preorder-bonus">Unlocks Lvl 5 (+20%)</div>
-        </div>
-        <div class="preorder-item" onclick="selectTier(5.0, 75000, this)">
-          <div class="preorder-ton">5.0 TON</div>
-          <div class="preorder-nex">75,000 NEX</div>
-          <div class="preorder-bonus">VIP Lvl 31 (+50%)</div>
+          <div class="preorder-nex" id="tier-nex-3">55,000 NEX</div>
+          <div class="preorder-bonus" id="tier-lvl-3">VIP Lvl 23</div>
         </div>
       </div>
 
       <div class="form-group">
-        <label class="form-label">Or Custom TON Amount (1 TON = 10,000 NEX):</label>
-        <input type="number" id="custom-ton-input" class="form-input" placeholder="e.g. 0.25" oninput="calculateCustomNEX(this.value)">
+        <label class="form-label" id="custom-ton-label">Or Custom TON Amount (1 TON ≈ 55,000 NEX):</label>
+        <input type="number" id="custom-ton-input" class="form-input" placeholder="e.g. 0.05" oninput="calculateCustomNEX(this.value)">
       </div>
 
       <button class="btn-claim-huge" style="margin-bottom:0; background: linear-gradient(90deg, #00e5ff, #0072ff); color: #fff;" onclick="executePreorder()">
-        🚀 Buy <span id="preorder-nex-amount">2,500</span> $NEX (<span id="preorder-ton-amount">0.25</span> TON)
+        🚀 Buy <span id="preorder-nex-amount">5,500</span> $NEX (<span id="preorder-ton-amount">0.1</span> TON)
       </button>
     </div>
   </div>
@@ -325,7 +325,6 @@
 
     <div class="card">
       <div style="font-weight: 800; font-size: 14px; margin-bottom: 10px;">Partner & Social Missions</div>
-      <!-- STRICT VERIFIED CHANNEL TASK -->
       <div class="task-row">
         <div>
           <div style="font-size: 13px; font-weight: 700;">Join NEXORA Official Channel</div>
@@ -435,9 +434,16 @@
     document.getElementById('user-display-name').innerText = currentUsername;
   }
 
-  // Live NEX Token Price & Sparkline Chart Updater (Real On-Chain DEX Price)
+  // Live Market Rate Calculation (NEX USD & TON USD -> Dynamic 1 TON = X NEX)
   const NEX_JETTON = "EQAeLwGfxkF0FYmX1y6s6Iqw2bt2JR0OjeV4tlXeHw9-1khw";
-  let chartPoints = [38, 36, 40, 35, 37, 33, 35, 31, 34, 30, 32, 29, 30];
+  const TIER_TONS = [0.1, 0.25, 0.5, 1.0];
+  let selectedTierIndex = 0;
+  let selectedTon = 0.1;
+  let selectedNex = 5500;
+  let liveNexPriceUsd = 0.0000252;
+  let liveTonPriceUsd = 1.40;
+  let liveNexPerTon = Math.floor(liveTonPriceUsd / liveNexPriceUsd);
+  let chartPoints = [42, 36, 44, 30, 35, 24, 29, 20, 26, 16, 22, 14, 18];
 
   function renderSparkline(points, isPositive) {
     const step = 300 / (points.length - 1);
@@ -453,27 +459,66 @@
     document.querySelector('#chartGrad stop[offset="0%"]').setAttribute('stop-color', color);
   }
 
+  function refreshMarketBuyRates() {
+    liveNexPerTon = Math.max(1000, Math.floor(liveTonPriceUsd / liveNexPriceUsd));
+    document.getElementById('nex-ton-rate').innerText = `1 TON ≈ ${liveNexPerTon.toLocaleString()} NEX`;
+    document.getElementById('custom-ton-label').innerText = `Or Custom TON Amount (1 TON ≈ ${liveNexPerTon.toLocaleString()} NEX):`;
+
+    TIER_TONS.forEach((tonVal, idx) => {
+      const nexQty = Math.floor(tonVal * liveNexPerTon);
+      const unlockLvl = Math.min(500, Math.floor(nexQty / 2500) + 1);
+      const nexEl = document.getElementById(`tier-nex-${idx}`);
+      const lvlEl = document.getElementById(`tier-lvl-${idx}`);
+      if (nexEl) nexEl.innerText = `${nexQty.toLocaleString()} NEX`;
+      if (lvlEl) lvlEl.innerText = `Unlocks Lvl ${unlockLvl}`;
+    });
+
+    const customVal = parseFloat(document.getElementById('custom-ton-input').value);
+    if (!isNaN(customVal) && customVal > 0) {
+      selectedTon = customVal;
+      selectedNex = Math.floor(customVal * liveNexPerTon);
+    } else if (selectedTierIndex !== null) {
+      selectedTon = TIER_TONS[selectedTierIndex];
+      selectedNex = Math.floor(selectedTon * liveNexPerTon);
+    }
+    document.getElementById('preorder-ton-amount').innerText = selectedTon;
+    document.getElementById('preorder-nex-amount').innerText = selectedNex.toLocaleString();
+  }
+
   async function updateLiveTokenPrice() {
     let realPrice = null;
-    let change24h = null;
-    let sourceLabel = "DeDust & STON.fi • Live";
+    let change24h = 0;
+    let sourceLabel = "STONFI-V2 • Live Pool";
+    let poolAddress = null;
 
-    // 1. Fetch from GeckoTerminal Pools API
+    // 1. Fetch live TON/USD price from TonAPI
+    try {
+      const tonPriceRes = await fetch(`https://tonapi.io/v2/rates?tokens=ton&currencies=usd`);
+      if (tonPriceRes.ok) {
+        const tpJson = await tonPriceRes.json();
+        const tUsd = tpJson?.rates?.TON?.prices?.USD;
+        if (tUsd && tUsd > 0) liveTonPriceUsd = parseFloat(tUsd);
+      }
+    } catch (e) {}
+
+    // 2. Fetch live NEX price & Pool Address from GeckoTerminal
     try {
       const poolRes = await fetch(`https://api.geckoterminal.com/api/v2/networks/ton/tokens/${NEX_JETTON}/pools?page=1`);
       if (poolRes.ok) {
         const poolJson = await poolRes.json();
-        const topPool = poolJson?.data?.[0]?.attributes;
+        const topPoolData = poolJson?.data?.[0];
+        const topPool = topPoolData?.attributes;
         if (topPool && topPool.base_token_price_usd) {
           realPrice = parseFloat(topPool.base_token_price_usd);
           change24h = parseFloat(topPool.price_change_percentage?.h24 || 0);
-          const dexName = poolJson?.data?.[0]?.relationships?.dex?.data?.id || "TON DEX";
+          const dexName = topPoolData?.relationships?.dex?.data?.id || "STONFI-V2";
           sourceLabel = `${dexName.toUpperCase()} • Live Pool`;
+          poolAddress = topPool.address;
         }
       }
     } catch (e) {}
 
-    // 2. Fallback to DexScreener API
+    // 3. Fallback to DexScreener
     if (!realPrice) {
       try {
         const dsRes = await fetch(`https://api.dexscreener.com/latest/dex/tokens/${NEX_JETTON}`);
@@ -483,48 +528,48 @@
           if (pair && pair.priceUsd) {
             realPrice = parseFloat(pair.priceUsd);
             change24h = parseFloat(pair.priceChange?.h24 || 0);
-            sourceLabel = `${(pair.dexId || 'TON DEX').toUpperCase()} • Live`;
-          }
-        }
-      } catch (e) {}
-    }
-
-    // 3. Fallback to TonAPI Rates
-    if (!realPrice) {
-      try {
-        const tonRes = await fetch(`https://tonapi.io/v2/rates?tokens=${NEX_JETTON}&currencies=usd`);
-        if (tonRes.ok) {
-          const tonJson = await tonRes.json();
-          const rateObj = tonJson?.rates?.[NEX_JETTON];
-          if (rateObj && rateObj.prices?.USD) {
-            realPrice = parseFloat(rateObj.prices.USD);
-            change24h = parseFloat((rateObj.diff_24h?.USD || "0").replace('%', ''));
-            sourceLabel = "TON Network • Live";
+            sourceLabel = `${(pair.dexId || 'TON DEX').toUpperCase()} • Live Pool`;
           }
         }
       } catch (e) {}
     }
 
     if (realPrice && realPrice > 0) {
+      liveNexPriceUsd = realPrice;
       document.getElementById('nex-live-price').innerText = `$${realPrice.toFixed(7)}`;
       document.getElementById('dex-source-txt').innerText = sourceLabel;
 
-      const isUp = (change24h || 0) >= 0;
+      const isUp = change24h >= 0;
       const changeEl = document.getElementById('nex-price-change');
-      changeEl.innerText = `${isUp ? '+' : ''}${(change24h || 0).toFixed(2)}% • 24h`;
+      changeEl.innerText = `${isUp ? '+' : ''}${change24h.toFixed(2)}% • 24h`;
       changeEl.style.color = isUp ? 'var(--accent-green)' : '#ff5252';
 
-      const normY = Math.max(10, Math.min(54, 35 - ((realPrice - 0.00002) * 800000)));
-      chartPoints.shift();
-      chartPoints.push(Math.round(normY));
-      renderSparkline(chartPoints, isUp);
-    } else {
-      document.getElementById('nex-live-price').innerText = `$0.0000200`;
-      document.getElementById('nex-price-change').innerText = `+0.00% • 24h`;
+      // Fetch real OHLCV candles for sparkline wave if poolAddress exists
+      if (poolAddress) {
+        try {
+          const ohlcvRes = await fetch(`https://api.geckoterminal.com/api/v2/networks/ton/pools/${poolAddress}/ohlcv/hour?limit=15`);
+          if (ohlcvRes.ok) {
+            const ohlcvJson = await ohlcvRes.json();
+            const list = ohlcvJson?.data?.attributes?.ohlcv_list;
+            if (Array.isArray(list) && list.length >= 4) {
+              const closes = list.slice().reverse().map(c => parseFloat(c[4]));
+              const minC = Math.min(...closes);
+              const maxC = Math.max(...closes);
+              const range = maxC - minC;
+              if (range > 0) {
+                chartPoints = closes.map(v => Math.round(52 - ((v - minC) / range) * 38));
+                renderSparkline(chartPoints, isUp);
+              }
+            }
+          }
+        } catch (e) {}
+      }
     }
+    refreshMarketBuyRates();
   }
+  refreshMarketBuyRates();
   updateLiveTokenPrice();
-  setInterval(updateLiveTokenPrice, 10000);
+  setInterval(updateLiveTokenPrice, 15000);
 
   // Mining & Level Calculation
   function getSpeedForLevel(lvl) {
@@ -584,7 +629,6 @@
   }
 
   // Referral System
-  const BOT_USERNAME = "NEXORA_Crypto_Mining_Bot";
   const urlParams = new URLSearchParams(window.location.search);
   const refFromUrl = urlParams.get('ref');
   const refFromTg = tg.initDataUnsafe ? tg.initDataUnsafe.start_param : null;
@@ -971,25 +1015,24 @@
     }
   }
 
-  let selectedTon = 0.25;
-  let selectedNex = 2500;
-
-  function selectTier(ton, nex, el) {
+  function selectTierByIndex(idx, el) {
     document.querySelectorAll('.preorder-item').forEach(i => i.classList.remove('selected'));
     el.classList.add('selected');
-    selectedTon = ton;
-    selectedNex = nex;
+    selectedTierIndex = idx;
+    selectedTon = TIER_TONS[idx];
+    selectedNex = Math.floor(selectedTon * liveNexPerTon);
     document.getElementById('custom-ton-input').value = "";
-    document.getElementById('preorder-ton-amount').innerText = ton;
-    document.getElementById('preorder-nex-amount').innerText = nex.toLocaleString();
+    document.getElementById('preorder-ton-amount').innerText = selectedTon;
+    document.getElementById('preorder-nex-amount').innerText = selectedNex.toLocaleString();
   }
 
   function calculateCustomNEX(val) {
     const ton = parseFloat(val);
     if (!isNaN(ton) && ton > 0) {
       document.querySelectorAll('.preorder-item').forEach(i => i.classList.remove('selected'));
+      selectedTierIndex = null;
       selectedTon = ton;
-      selectedNex = Math.floor(ton * 10000);
+      selectedNex = Math.floor(ton * liveNexPerTon);
       document.getElementById('preorder-ton-amount').innerText = ton;
       document.getElementById('preorder-nex-amount').innerText = selectedNex.toLocaleString();
     }
@@ -1088,7 +1131,6 @@
     }
   });
 
-  // Strict Telegram Channel Membership Check
   let task1Opened = false;
   async function handleVerifiedChannelTask(taskId, reward, link, btn) {
     if (localStorage.getItem('nex_done_' + taskId)) return;
