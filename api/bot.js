@@ -104,7 +104,7 @@ module.exports = async (req, res) => {
           inline_keyboard: [
             [{ text: "⚡ Open NEXORA", web_app: { url: webAppUrl } }],
             [{ text: "📈 NEX Live Price", callback_data: "check_nex_price" }],
-            [{ text: "📢 News Channel", url: "https://t.me/A_TOOLSx2" }]
+            [{ text: "📢 News Channel", url: "https://t.me/nexora_mining" }]
           ]
         }
       );
